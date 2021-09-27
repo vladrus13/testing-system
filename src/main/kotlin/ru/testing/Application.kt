@@ -2,10 +2,10 @@ package ru.testing
 
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import ru.testing.plugins.*
+import ru.testing.plugins.module
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
-        configureRouting()
+        module()
     }.start(wait = true)
 }

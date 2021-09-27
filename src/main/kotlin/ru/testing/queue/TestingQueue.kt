@@ -5,6 +5,14 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 class TestingQueue {
     companion object {
-        val queue : ConcurrentLinkedQueue<Task> = ConcurrentLinkedQueue<Task>()
+        private val queue: ConcurrentLinkedQueue<Task> = ConcurrentLinkedQueue<Task>()
+
+        fun add(task: Task) {
+            queue.add(task)
+        }
+
+        fun get(): Task? {
+            return queue.poll()
+        }
     }
 }

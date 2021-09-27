@@ -1,15 +1,16 @@
 package ru.testing.plugins
 
-import io.ktor.routing.*
-import io.ktor.http.*
 import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.request.*
+import io.ktor.html.*
+import io.ktor.routing.*
 
-fun Application.configureRouting() {
+fun Application.module() {
     routing {
         get("/") {
-            call.respondText("Hello World!")
+            call.respondHtml {
+
+            }
+
         }
     }
 }
