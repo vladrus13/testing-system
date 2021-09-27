@@ -6,9 +6,10 @@ import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.util.*
 import kotlinx.html.*
-import java.io.File
+import ru.testing.queue.TestingQueue
+import ru.testing.task.Task
+import ru.testing.task.TaskFile
 
 fun Application.module() {
     routing {
@@ -33,7 +34,7 @@ fun Application.module() {
 
                 }
                 body {
-                    form (method = FormMethod.post, encType = FormEncType.multipartFormData){
+                    form(method = FormMethod.post, encType = FormEncType.multipartFormData) {
                         acceptCharset = "utf-8"
                         input(type = InputType.file, name = "chooseFile")
                         br()
@@ -47,9 +48,7 @@ fun Application.module() {
         post("/chooseFile") {
             val multipart = call.receiveMultipart()
             var title = ""
-            var text : String? = null
-
-            // Processes each part of the multipart input content of the user
+            var text: String? = null
             multipart.forEachPart { part ->
                 if (part is PartData.FormItem) {
                     if (part.name == "title") {
@@ -60,10 +59,11 @@ fun Application.module() {
                         text = it.bufferedReader().use { it1 -> it1.readText() }
                     }
                 }
-
                 part.dispose()
             }
             if (text != null) {
+                val task = Task(TaskFile(title = title, listing = text!!, fileType = TaskFile.TaskFileType.JAVA))
+                TestingQueue.add(task)
                 call.respondText(text!!)
             } else {
                 call.respondText("Ban!!!")

@@ -1,4 +1,4 @@
 package ru.testing.task
 
-interface Task {
+class Task(val taskFile: TaskFile) {
 }
