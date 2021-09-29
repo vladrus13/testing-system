@@ -6,8 +6,6 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.nameWithoutExtension
 
 class JavaProcessFile : ProcessFile() {
-    override fun toExtension(): String = "java"
-
     override fun runSolveFile(path: Path, input: String): OutputProcessFile {
         val folder = path.parent
         val name = path.nameWithoutExtension

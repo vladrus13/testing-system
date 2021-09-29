@@ -13,8 +13,6 @@ abstract class ProcessFile {
         val code: Int = 0
     )
 
-    abstract fun toExtension(): String
-
     private fun setInput(path: Path, input: String) {
         path.toFile().printWriter(StandardCharsets.UTF_8).use {
             it.println(input)
