@@ -8,6 +8,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.html.*
 import ru.testing.queue.TestingQueue
+import ru.testing.task.JavaProcessFile
 import ru.testing.task.Task
 import ru.testing.task.TaskFile
 
@@ -47,22 +48,19 @@ fun Application.module() {
         }
         post("/chooseFile") {
             val multipart = call.receiveMultipart()
-            var title = ""
+            var title = "Source"
             var text: String? = null
             multipart.forEachPart { part ->
-                if (part is PartData.FormItem) {
-                    if (part.name == "title") {
-                        title = part.value
-                    }
-                } else if (part is PartData.FileItem) {
+                if (part is PartData.FileItem) {
                     part.streamProvider().use {
+                        title = part.originalFileName!!
                         text = it.bufferedReader().use { it1 -> it1.readText() }
                     }
                 }
                 part.dispose()
             }
             if (text != null) {
-                val task = Task(TaskFile(title = title, listing = text!!, fileType = TaskFile.TaskFileType.JAVA))
+                val task = Task(TaskFile(title = title, listing = text!!, fileType = JavaProcessFile()))
                 TestingQueue.add(task)
                 call.respondText(text!!)
             } else {
