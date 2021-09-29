@@ -1,4 +1,4 @@
-package ru.testing.server
+package ru.testing.testing.server
 
 import java.util.concurrent.Executors
 

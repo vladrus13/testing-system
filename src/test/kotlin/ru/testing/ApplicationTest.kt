@@ -1,4 +1,3 @@
 package ru.testing
 
-class ApplicationTest {
-}
+class ApplicationTest

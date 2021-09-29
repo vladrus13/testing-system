@@ -7,10 +7,9 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.html.*
-import ru.testing.queue.TestingQueue
-import ru.testing.task.JavaProcessFile
-import ru.testing.task.Task
-import ru.testing.task.TaskFile
+import ru.testing.testing.queue.TestingQueue
+import ru.testing.testing.submission.JavaSubmissionProcessFile
+import ru.testing.testing.submission.SubmissionFile
 
 fun Application.module() {
     routing {
@@ -60,7 +59,7 @@ fun Application.module() {
                 part.dispose()
             }
             if (text != null) {
-                val task = Task(TaskFile(title = title, listing = text!!, fileType = JavaProcessFile()))
+                val task = SubmissionFile(title = title, listing = text!!, fileType = JavaSubmissionProcessFile())
                 TestingQueue.add(task)
                 call.respondText(text!!)
             } else {

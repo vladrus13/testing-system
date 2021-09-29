@@ -1,11 +1,11 @@
-package ru.testing.task
+package ru.testing.testing.submission
 
-import ru.testing.limits.Limits
+import ru.testing.testing.limits.Limits
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.nameWithoutExtension
 
-class JavaProcessFile : ProcessFile() {
+class JavaSubmissionProcessFile : SubmissionProcessFile() {
     override fun runSolveFile(path: Path, input: String): OutputProcessFile {
         val folder = path.parent
         val name = path.nameWithoutExtension
@@ -18,7 +18,6 @@ class JavaProcessFile : ProcessFile() {
         if (results.code != 0) {
             return results
         }
-        val classFile = folder.resolve(name)
         return getProcessBuilder(
             command = listOf("java", "-cp", ".", name),
             directory = folder,

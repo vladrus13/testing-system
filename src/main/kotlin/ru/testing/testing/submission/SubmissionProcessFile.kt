@@ -1,11 +1,11 @@
-package ru.testing.task
+package ru.testing.testing.submission
 
-import ru.testing.limits.Limits
+import ru.testing.testing.limits.Limits
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
-abstract class ProcessFile {
+abstract class SubmissionProcessFile {
 
     class OutputProcessFile(
         val output: String = "",

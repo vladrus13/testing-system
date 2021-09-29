@@ -1,4 +1,4 @@
-package ru.testing.limits
+package ru.testing.testing.limits
 
 class Limits(
     var timeLimitMilliseconds: Long = 1000L,

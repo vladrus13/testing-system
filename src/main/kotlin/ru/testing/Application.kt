@@ -3,7 +3,7 @@ package ru.testing
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import ru.testing.plugins.module
-import ru.testing.server.Server
+import ru.testing.testing.server.Server
 
 fun main() {
     Server(1).run()
