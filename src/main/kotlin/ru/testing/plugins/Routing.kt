@@ -7,9 +7,11 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.html.*
+import ru.testing.database.ResultHolder
 import ru.testing.testing.queue.TestingQueue
-import ru.testing.testing.submission.JavaSubmissionProcessFile
+import ru.testing.testing.submission.CPPSubmissionProcessFile
 import ru.testing.testing.submission.SubmissionFile
+import ru.testing.testing.task.APlusB
 
 fun Application.module() {
     routing {
@@ -59,11 +61,27 @@ fun Application.module() {
                 part.dispose()
             }
             if (text != null) {
-                val task = SubmissionFile(title = title, listing = text!!, fileType = JavaSubmissionProcessFile())
+                val task = SubmissionFile(
+                    title = title,
+                    listing = text!!,
+                    fileType = CPPSubmissionProcessFile(),
+                    task = APlusB()
+                )
                 TestingQueue.add(task)
                 call.respondText(text!!)
             } else {
                 call.respondText("Ban!!!")
+            }
+        }
+        get("/submission/{id}") {
+            val id = call.parameters["id"]!!.toLong()
+            val result = ResultHolder.holder[id]
+            if (result == null) {
+                call.respondText("Id $id not found!")
+            } else {
+                call.respondText(result.joinToString(separator = "\n") {
+                    it.toString()
+                })
             }
         }
     }

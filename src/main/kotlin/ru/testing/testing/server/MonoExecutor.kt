@@ -1,5 +1,6 @@
 package ru.testing.testing.server
 
+import ru.testing.database.ResultHolder
 import ru.testing.testing.queue.TestingQueue
 import ru.testing.utils.TestingConfiguration
 import java.nio.charset.StandardCharsets
@@ -18,10 +19,8 @@ class MonoExecutor {
             solveFile.toFile().printWriter(StandardCharsets.UTF_8).use { out ->
                 out.println(newTask.listing)
             }
-            val results = newTask.fileType.runSolveFile(solveFile, "")
-            println("Code: ${results.code}")
-            println("Error: ${results.error}")
-            println("Output: ${results.output}")
+            val results = newTask.fileType.runSolveFile(solveFile, newTask.task)
+            ResultHolder.holder[ResultHolder.holder.size.toLong()] = results
         }
     }
 

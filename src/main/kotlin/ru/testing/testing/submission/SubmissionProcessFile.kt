@@ -1,6 +1,8 @@
 package ru.testing.testing.submission
 
 import ru.testing.testing.limits.Limits
+import ru.testing.testing.task.Task
+import ru.testing.testing.task.TestVerdict
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
@@ -67,5 +69,5 @@ abstract class SubmissionProcessFile {
         }
     }
 
-    abstract fun runSolveFile(path: Path, input: String): OutputProcessFile
+    abstract fun runSolveFile(path: Path, task: Task): List<TestVerdict>
 }

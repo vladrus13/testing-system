@@ -7,13 +7,13 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.nameWithoutExtension
 
-class JavaSubmissionProcessFile : SubmissionProcessFile() {
+class CPPSubmissionProcessFile : SubmissionProcessFile() {
     override fun runSolveFile(path: Path, task: Task): List<TestVerdict> {
         val folder = path.parent
         val name = path.nameWithoutExtension
         // TODO results exit code != 0
         val results = getProcessBuilder(
-            command = listOf("javac", path.absolutePathString()),
+            command = listOf("g++", path.absolutePathString(), "-o", name),
             directory = folder,
             limits = Limits.COMPILATION_LIMITS
         )
@@ -22,8 +22,9 @@ class JavaSubmissionProcessFile : SubmissionProcessFile() {
             // TODO not ignore wrong execution
             result.add(
                 it.verdict(
+                    // TODO not only linux execution
                     getProcessBuilder(
-                        command = listOf("java", "-cp", ".", name),
+                        command = listOf("./${name}"),
                         directory = folder,
                         input = it.input,
                         limits = Limits.OLYMPIC_LIMITS
