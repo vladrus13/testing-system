@@ -13,6 +13,10 @@ import ru.testing.testing.submission.CPPSubmissionProcessFile
 import ru.testing.testing.submission.SubmissionFile
 import ru.testing.testing.task.APlusB
 
+/**
+ * Routing function
+ *
+ */
 fun Application.module() {
     routing {
         get("/") {

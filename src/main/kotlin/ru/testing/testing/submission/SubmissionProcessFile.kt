@@ -7,8 +7,19 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
+/**
+ * Submission type. Run solution we get
+ *
+ */
 abstract class SubmissionProcessFile {
 
+    /**
+     * Output of execution
+     *
+     * @property output output of program
+     * @property error error stream of program
+     * @property code exiting code of program
+     */
     class OutputProcessFile(
         val output: String = "",
         val error: String = "",
@@ -26,7 +37,16 @@ abstract class SubmissionProcessFile {
             it.readText()
         }
 
-    fun getProcessBuilder(
+    /**
+     * Execute command
+     *
+     * @param command command what we execution
+     * @param directory directory where we're executing
+     * @param input input which we give to execution
+     * @param limits limits of execution
+     * @return
+     */
+    fun execute(
         command: List<String>,
         directory: Path,
         input: String? = null,
@@ -69,5 +89,12 @@ abstract class SubmissionProcessFile {
         }
     }
 
+    /**
+     * Run solve of file on tests
+     *
+     * @param path path to solve
+     * @param task task we must test
+     * @return list of verdicts
+     */
     abstract fun runSolveFile(path: Path, task: Task): List<TestVerdict>
 }

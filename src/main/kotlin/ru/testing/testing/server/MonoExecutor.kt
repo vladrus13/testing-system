@@ -6,10 +6,18 @@ import ru.testing.utils.TestingConfiguration
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+/**
+ * Mono thread executor. Take tasks and execute it
+ *
+ */
 class MonoExecutor {
 
     private var isExited = false
 
+    /**
+     * Starts executor
+     *
+     */
     fun run() {
         while (!isExited) {
             val newTask = TestingQueue.get() ?: continue
@@ -24,6 +32,10 @@ class MonoExecutor {
         }
     }
 
+    /**
+     * Try to stop executor (it wouldn't take any tasks anymore). It can take some time
+     *
+     */
     fun stop() {
         isExited = true
     }
