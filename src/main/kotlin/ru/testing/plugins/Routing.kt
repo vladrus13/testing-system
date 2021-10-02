@@ -10,7 +10,9 @@ import kotlinx.html.*
 import ru.testing.database.ResultHolder
 import ru.testing.testing.queue.TestingQueue
 import ru.testing.testing.submission.CPPSubmissionProcessFile
-import ru.testing.testing.submission.SubmissionFile
+import ru.testing.testing.submission.JavaSubmissionProcessFile
+import ru.testing.testing.submission.SubmissionProcessFile
+import ru.testing.testing.submission.SubmissionsFactory
 import ru.testing.testing.task.APlusB
 
 /**
@@ -42,7 +44,22 @@ fun Application.module() {
                 body {
                     form(method = FormMethod.post, encType = FormEncType.multipartFormData) {
                         acceptCharset = "utf-8"
-                        input(type = InputType.file, name = "chooseFile")
+                        select {
+                            this.name = "chooseLanguage"
+                            option {
+                                value = "java"
+                                text("Java")
+                            }
+                            option {
+                                value = "cpp"
+                                text("C++")
+                            }
+                        }
+                        br()
+                        input(type = InputType.file, name = "chooseFile") {
+                            required = true
+                        }
+                        br()
                         br()
                         submitInput(classes = "pure-button pure-button-primary") {
                             value = "Send"
@@ -52,10 +69,20 @@ fun Application.module() {
             }
         }
         post("/chooseFile") {
+            var submissionProcessFile: SubmissionProcessFile = CPPSubmissionProcessFile()
             val multipart = call.receiveMultipart()
             var title = "Source"
             var text: String? = null
             multipart.forEachPart { part ->
+                if (part is PartData.FormItem) {
+                    if (part.name == "chooseLanguage") {
+                        submissionProcessFile = when (part.value) {
+                            "cpp" -> CPPSubmissionProcessFile()
+                            "java" -> JavaSubmissionProcessFile()
+                            else -> CPPSubmissionProcessFile()
+                        }
+                    }
+                }
                 if (part is PartData.FileItem) {
                     part.streamProvider().use {
                         title = part.originalFileName!!
@@ -65,14 +92,14 @@ fun Application.module() {
                 part.dispose()
             }
             if (text != null) {
-                val task = SubmissionFile(
+                val task = SubmissionsFactory.getInstance(
                     title = title,
                     listing = text!!,
-                    fileType = CPPSubmissionProcessFile(),
+                    fileType = submissionProcessFile,
                     task = APlusB()
                 )
                 TestingQueue.add(task)
-                call.respondText(text!!)
+                call.respondRedirect(url = "http://localhost:8080/submission/${task.id}")
             } else {
                 call.respondText("Ban!!!")
             }

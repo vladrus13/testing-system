@@ -10,4 +10,10 @@ import ru.testing.testing.task.Task
  * @property fileType type of submission
  * @property task on which task we test thins submission
  */
-class SubmissionFile(val title: String?, val listing: String, val fileType: SubmissionProcessFile, val task: Task)
+class SubmissionFile(
+    val id: Long,
+    val title: String?,
+    val listing: String,
+    val fileType: SubmissionProcessFile,
+    val task: Task
+)
