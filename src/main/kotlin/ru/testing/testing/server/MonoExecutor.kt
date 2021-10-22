@@ -3,8 +3,13 @@ package ru.testing.testing.server
 import ru.testing.database.ResultHolder
 import ru.testing.testing.queue.TestingQueue
 import ru.testing.utils.TestingConfiguration
+import java.io.IOException
 import java.nio.charset.StandardCharsets
+import java.nio.file.FileVisitResult
+import java.nio.file.FileVisitor
 import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.attribute.BasicFileAttributes
 
 /**
  * Mono thread executor. Take tasks and execute it
@@ -29,6 +34,25 @@ class MonoExecutor {
             }
             val results = newTask.fileType.runSolveFile(solveFile, newTask.task)
             ResultHolder.holder[ResultHolder.holder.size.toLong()] = results
+            Files.walkFileTree(templateDirectory, object : FileVisitor<Path> {
+                override fun preVisitDirectory(dir: Path?, attrs: BasicFileAttributes?): FileVisitResult {
+                    return FileVisitResult.CONTINUE
+                }
+
+                override fun visitFile(file: Path?, attrs: BasicFileAttributes?): FileVisitResult {
+                    if (file != null) Files.delete(file)
+                    return FileVisitResult.CONTINUE
+                }
+
+                override fun visitFileFailed(file: Path?, exc: IOException?): FileVisitResult {
+                    return FileVisitResult.CONTINUE
+                }
+
+                override fun postVisitDirectory(dir: Path?, exc: IOException?): FileVisitResult {
+                    if (dir != null) Files.delete(dir)
+                    return FileVisitResult.CONTINUE
+                }
+            })
         }
     }
 

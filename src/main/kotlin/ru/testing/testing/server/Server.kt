@@ -31,7 +31,11 @@ class Server(count: Int) {
     fun run() {
         list.forEach {
             executorService.submit {
-                it.run()
+                try {
+                    it.run()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }

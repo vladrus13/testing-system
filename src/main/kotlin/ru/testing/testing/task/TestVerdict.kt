@@ -36,5 +36,19 @@ sealed class TestVerdict {
         }
     }
 
+    class RE(private val code: Int, private val verdict: String) : TestVerdict() {
+        override fun toString(): String {
+            return "Code: $code. $verdict"
+        }
+
+    }
+
+    class CE(private val verdict: String) : TestVerdict() {
+        override fun toString(): String {
+            return verdict
+        }
+
+    }
+
     abstract override fun toString(): String
 }
