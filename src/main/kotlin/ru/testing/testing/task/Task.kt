@@ -10,4 +10,4 @@ import ru.testing.testing.limits.Limits
  *
  * @see Limits
  */
-open class Task(open val tests: List<Test>)
+open class Task(id: Int, open val tests: List<Test>)

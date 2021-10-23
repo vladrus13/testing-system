@@ -2,7 +2,7 @@ package ru.testing
 
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import ru.testing.plugins.module
+import ru.testing.controller.module
 import ru.testing.testing.server.Server
 
 /**

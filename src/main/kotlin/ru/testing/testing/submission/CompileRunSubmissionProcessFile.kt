@@ -1,6 +1,8 @@
 package ru.testing.testing.submission
 
+import ru.testing.database.ResultHolder
 import ru.testing.testing.task.CompileRunTask
+import ru.testing.testing.task.SubmissionVerdict
 import ru.testing.testing.task.Task
 import ru.testing.testing.task.TestVerdict
 import java.nio.file.Path
@@ -12,7 +14,7 @@ abstract class CompileRunSubmissionProcessFile : SubmissionProcessFile() {
 
     abstract fun getRunCommand(name: String): List<String>
 
-    override fun runSolveFile(path: Path, task: Task): List<TestVerdict> {
+    override fun runSolveFile(idSubmission: Long, path: Path, task: Task) {
         if (task !is CompileRunTask) throw IllegalStateException("Task must be compile and run task")
         val folder = path.parent
         val name = path.nameWithoutExtension
@@ -22,24 +24,29 @@ abstract class CompileRunSubmissionProcessFile : SubmissionProcessFile() {
             limits = task.compile
         )
         if (results.code != 0) {
-            return mutableListOf(TestVerdict.CE(results.error))
-        }
-        val result: MutableList<TestVerdict> = mutableListOf()
-        task.tests.forEach {
-            val execution = execute(
-                command = getRunCommand(name),
-                directory = folder,
-                input = it.input,
-                limits = task.run
+            ResultHolder.sendVerdict(idSubmission, SubmissionVerdict.CompilationError(results.error))
+        } else {
+            ResultHolder.sendVerdict(
+                idSubmission, SubmissionVerdict.RunningVerdict(
+                    ArrayList(task.tests.indices.map { TestVerdict.NL() })
+                )
             )
-            result.add(
-                if (execution.code != 0) {
-                    TestVerdict.RE(execution.code, execution.error)
-                } else {
-                    it.verdict(execution.output)
-                }
-            )
+            task.tests.forEachIndexed { index, test ->
+                val execution = execute(
+                    command = getRunCommand(name),
+                    directory = folder,
+                    input = test.input,
+                    limits = task.run
+                )
+                ResultHolder.sendVerdict(
+                    idSubmission, index,
+                    if (execution.code != 0) {
+                        TestVerdict.RE(execution.code, execution.error)
+                    } else {
+                        test.verdict(execution.output)
+                    }
+                )
+            }
         }
-        return result
     }
 }

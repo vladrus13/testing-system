@@ -1,6 +1,9 @@
-package ru.testing.testing.task
+package ru.testing.testing.task.tasks
 
 import ru.testing.testing.limits.Limits
+import ru.testing.testing.task.CompileRunTask
+import ru.testing.testing.task.Test
+import ru.testing.testing.task.TestVerdict
 
 /**
  * Test to A+B task
@@ -23,6 +26,7 @@ class APlusBTest(private val a: Int, private val b: Int) : Test("$a $b\n") {
  *
  */
 class APlusB : CompileRunTask(
+    1,
     listOf(
         APlusBTest(0, 0),
         APlusBTest(1, 0),

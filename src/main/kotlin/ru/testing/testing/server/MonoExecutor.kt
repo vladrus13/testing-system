@@ -1,6 +1,5 @@
 package ru.testing.testing.server
 
-import ru.testing.database.ResultHolder
 import ru.testing.testing.queue.TestingQueue
 import ru.testing.utils.TestingConfiguration
 import java.io.IOException
@@ -32,8 +31,7 @@ class MonoExecutor {
             solveFile.toFile().printWriter(StandardCharsets.UTF_8).use { out ->
                 out.println(newTask.listing)
             }
-            val results = newTask.fileType.runSolveFile(solveFile, newTask.task)
-            ResultHolder.holder[ResultHolder.holder.size.toLong()] = results
+            newTask.fileType.runSolveFile(newTask.id, solveFile, newTask.task)
             Files.walkFileTree(templateDirectory, object : FileVisitor<Path> {
                 override fun preVisitDirectory(dir: Path?, attrs: BasicFileAttributes?): FileVisitResult {
                     return FileVisitResult.CONTINUE

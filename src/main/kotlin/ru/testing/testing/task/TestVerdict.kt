@@ -47,6 +47,12 @@ sealed class TestVerdict {
         override fun toString(): String {
             return verdict
         }
+    }
+
+    class NL : TestVerdict() {
+        override fun toString(): String {
+            return "Not launched"
+        }
 
     }
 
