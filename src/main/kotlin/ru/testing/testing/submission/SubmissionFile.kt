@@ -5,6 +5,7 @@ import ru.testing.testing.task.Task
 /**
  * Submission of participant. We must test it
  *
+ * @property id id of submission
  * @property title title of file (name of file)
  * @property listing code of this file
  * @property fileType type of submission

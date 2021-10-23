@@ -2,10 +2,12 @@ package ru.testing.controller
 
 import io.ktor.application.*
 import io.ktor.html.*
+import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import kotlinx.css.*
 import kotlinx.html.*
 import ru.testing.database.ResultHolder
 import ru.testing.testing.queue.TestingQueue
@@ -19,11 +21,41 @@ import ru.testing.testing.task.TasksHolder
 import ru.testing.view.Viewer
 
 /**
+ * Respond of css
+ *
+ * @param builder css builder
+ */
+suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
+    this.respondText(CssBuilder().apply(builder).toString(), ContentType.Text.CSS)
+}
+
+/**
  * Routing function
  *
  */
 fun Application.module() {
     routing {
+        get("/styles.css") {
+            call.respondCss {
+                rule(".verdicts .ok_verdict") {
+                    backgroundColor = rgb(216, 256, 216)
+                }
+                rule(".verdicts .wa_verdict") {
+                    backgroundColor = rgb(256, 216, 216)
+                }
+                rule(".verdicts .tl_verdict") {
+                    backgroundColor = rgb(216, 216, 256)
+                }
+                rule(".verdicts .re_verdict") {
+                    backgroundColor = rgb(256, 256, 216)
+                }
+                rule(".verdicts") {
+                    border = "1px"
+                    borderStyle = BorderStyle.solid
+                    borderColor = Color.black
+                }
+            }
+        }
         get("/") {
             call.respondHtml {
                 Viewer.getHTML(
@@ -136,9 +168,19 @@ fun Application.module() {
                                 text(result.cause)
                             }
                             is SubmissionVerdict.RunningVerdict -> {
-                                text(result.tests.joinToString(separator = "\n") {
-                                    it.toString()
-                                })
+                                table(classes = "verdicts") {
+                                    tr {
+                                        th {
+                                            text("Test")
+                                        }
+                                        th {
+                                            text("Verdict")
+                                        }
+                                    }
+                                    result.tests.forEachIndexed { index, test ->
+                                        test.toRow(index, this)
+                                    }
+                                }
                             }
                             is SubmissionVerdict.NotLaunchedVerdict -> {
                                 text("Not launched")

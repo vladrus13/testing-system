@@ -8,10 +8,27 @@ import ru.testing.testing.task.TestVerdict
 import java.nio.file.Path
 import kotlin.io.path.nameWithoutExtension
 
+/**
+ * Submission that compile and run
+ *
+ */
 abstract class CompileRunSubmissionProcessFile : SubmissionProcessFile() {
 
+    /**
+     * Get compile command
+     *
+     * @param path path to file
+     * @param name name of file
+     * @return list of command
+     */
     abstract fun getCompileCommand(path: Path, name: String): List<String>
 
+    /**
+     * Get run command
+     *
+     * @param name name of file
+     * @return list of command
+     */
     abstract fun getRunCommand(name: String): List<String>
 
     override fun runSolveFile(idSubmission: Long, path: Path, task: Task) {
