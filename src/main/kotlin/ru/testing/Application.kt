@@ -2,8 +2,8 @@ package ru.testing
 
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import ru.testing.controller.module
-import ru.testing.testing.server.Server
+import ru.testing.html.controller.module
+import ru.testing.polygon.server.Server
 
 /**
  * Main class. Launch servers

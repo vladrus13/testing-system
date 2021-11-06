@@ -1,13 +1,10 @@
 plugins {
-    application
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm")
+    idea
 }
 
 group = "ru.testing"
 version = "0.0.1"
-application {
-    mainClass.set("ru.testing.ApplicationKt")
-}
 
 repositories {
     mavenCentral()
@@ -23,6 +20,6 @@ dependencies {
     implementation("org.jetbrains.kotlin-wrappers:kotlin-css:1.0.0-pre.251-kotlin-1.5.31")
     implementation("com.github.docker-java:docker-java:3.2.12")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.0-M1")
-    implementation(project("html-server"))
-    implementation(project("polygon"))
+    implementation(project(":tasks"))
+    implementation(project(":testlib"))
 }
