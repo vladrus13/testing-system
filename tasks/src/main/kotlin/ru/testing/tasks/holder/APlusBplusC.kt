@@ -26,7 +26,6 @@ class APlusBTestPlusCTest(private val a: Int, private val b: Int, private val c:
  *
  */
 class APlusBPlusC : CompileRunTask(
-    2,
     listOf(
         APlusBTestPlusCTest(0, 0, 0),
         APlusBTestPlusCTest(1, 0, 0),

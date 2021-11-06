@@ -26,7 +26,6 @@ class APlusBTest(private val a: Int, private val b: Int) : Test("$a $b\n") {
  *
  */
 class APlusB : CompileRunTask(
-    1,
     listOf(
         APlusBTest(0, 0),
         APlusBTest(1, 0),
