@@ -12,4 +12,5 @@ repositories {
 
 dependencies {
     implementation(project(":testlib"))
+    implementation(kotlin("reflect"))
 }

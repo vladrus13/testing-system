@@ -1,8 +1,10 @@
 package ru.testing.tasks
 
-import ru.testing.tasks.holder.APlusB
-import ru.testing.tasks.holder.APlusBPlusC
+import org.w3c.dom.Node
 import ru.testing.testlib.task.Task
+import javax.xml.XMLConstants
+import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.reflect.KClass
 
 /**
  * Tasks holder
@@ -10,12 +12,45 @@ import ru.testing.testlib.task.Task
  */
 class TasksHolder {
     companion object {
+
         /**
          * Tasks
          */
-        val map: HashMap<Long, Task> = hashMapOf(
-            Pair(1, APlusB()),
-            Pair(2, APlusBPlusC()),
-        )
+        val map: HashMap<Long, Task> = run {
+            val result: HashMap<Long, Task> = hashMapOf()
+            val url = TasksHolder::class.java.getResource("/tasks.xml")
+            if (url == null || url.file == null) {
+                // TDOO some?
+            } else {
+                val documentBuilderFactory = DocumentBuilderFactory.newInstance()
+                documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+                val db = documentBuilderFactory.newDocumentBuilder()
+                val file = url.file
+                val document = db.parse(file)
+                document.documentElement.normalize()
+                val listTasks = document.getElementsByTagName("task")
+
+                val converter: Node.(String) -> String = { clazz ->
+                    val attributes = attributes
+                    val real =
+                        attributes.getNamedItem(clazz)
+                            ?: throw NullPointerException("Node with name $clazz can't be null")
+                    real.normalize()
+                    real.nodeValue
+                }
+
+                for (i in 0 until listTasks.length) {
+                    val item = listTasks.item(i)
+                    val id = item.converter("id").toLong()
+                    try {
+                        val clazz = Class.forName(item.converter("clazz")).kotlin as KClass<Task>
+                        result[id] = clazz.java.getDeclaredConstructor().newInstance()
+                    } catch (e: ClassCastException) {
+                        // ignore
+                    }
+                }
+            }
+            result
+        }
     }
 }
