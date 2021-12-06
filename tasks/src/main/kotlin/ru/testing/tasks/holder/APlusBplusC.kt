@@ -12,17 +12,17 @@ import ru.testing.testlib.task.TestVerdict
  * @property b b
  */
 class APlusBTestPlusCTest(private val a: Int, private val b: Int, private val c: Int) : Test("$a $b $c\n") {
-    override fun verdict(participant_answer: String): TestVerdict {
-        return if (participant_answer.trim().toInt() == a + b + c) {
+    override fun verdict(participantAnswer: String): TestVerdict {
+        return if (participantAnswer.trim().toInt() == a + b + c) {
             TestVerdict.OK
         } else {
-            TestVerdict.WA("Wrong answer. Expected: ${a + b + c}, actual: $participant_answer")
+            TestVerdict.WA("Wrong answer. Expected: ${a + b + c}, actual: $participantAnswer")
         }
     }
 }
 
 /**
- * A+B task
+ * A + B + C task
  *
  */
 class APlusBPlusC : CompileRunTask(
