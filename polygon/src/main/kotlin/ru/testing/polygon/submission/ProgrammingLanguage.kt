@@ -14,7 +14,7 @@ import kotlin.io.path.nameWithoutExtension
  * Submission to compile and run
  *
  */
-abstract class ProgrammingLanguage : SubmissionProcessFile() {
+sealed class ProgrammingLanguage : SubmissionProcessFile() {
 
     /**
      * Gets compiling command
@@ -34,7 +34,7 @@ abstract class ProgrammingLanguage : SubmissionProcessFile() {
     abstract fun getRunningCommand(name: String): List<String>
 
     override fun runSolverFile(
-        configuration: EnvironmentConfiguration, idSubmission: Long, path: Path, task: Task
+        configuration: EnvironmentConfiguration, submissionId: Long, path: Path, task: Task
     ) = with(configuration) {
         when (task) {
             is CompileRunTask -> {
@@ -44,11 +44,11 @@ abstract class ProgrammingLanguage : SubmissionProcessFile() {
                     command = getCompilingCommand(path, name),
                     directory = folder,
                     limits = task.compile
-                )
+                ) ?: return@with resultHolder.sendVerdict(submissionId, SubmissionVerdict.CompilationTimeLimit)
                 if (results.code != 0) {
-                    resultHolder.sendVerdict(idSubmission, SubmissionVerdict.CompilationError(results.error))
+                    resultHolder.sendVerdict(submissionId, SubmissionVerdict.CompilationError(results.error))
                 } else {
-                    resultHolder.sendVerdict(idSubmission, RunningVerdict(ArrayList(task.tests.indices.map { NL })))
+                    resultHolder.sendVerdict(submissionId, RunningVerdict(ArrayList(task.tests.indices.map { NL })))
                     task.tests.forEachIndexed { index, test ->
                         val execution = execute(
                             command = getRunningCommand(name),
@@ -57,11 +57,12 @@ abstract class ProgrammingLanguage : SubmissionProcessFile() {
                             limits = task.run
                         )
                         resultHolder.sendVerdict(
-                            idSubmission, index,
-                            if (execution.code != 0) RE(
-                                execution.code,
-                                execution.error
-                            ) else test.verdict(execution.output)
+                            submissionId, index,
+                            when {
+                                execution == null -> TL
+                                execution.code != 0 -> RE(execution.code, execution.error)
+                                else -> test.verdict(execution.output)
+                            }
                         )
                     }
                 }

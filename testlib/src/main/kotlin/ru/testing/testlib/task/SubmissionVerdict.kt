@@ -11,19 +11,24 @@ sealed class SubmissionVerdict {
      *
      * @property cause cause of compilation error
      */
-    class CompilationError(val cause: String) : SubmissionVerdict()
+    data class CompilationError(val cause: String) : SubmissionVerdict()
+
+    /**
+     * Compilation took too much time verdict
+     */
+    object CompilationTimeLimit: SubmissionVerdict()
 
     /**
      * Running verdict
      *
      * @property tests verdicts of running
      */
-    class RunningVerdict(val tests: ArrayList<TestVerdict>) : SubmissionVerdict()
+    data class RunningVerdict(val tests: ArrayList<TestVerdict>) : SubmissionVerdict()
 
     /**
      * Not launched verdict
      *
      * @property testsCount count of tests
      */
-    class NotLaunchedVerdict(private val testsCount: Int) : SubmissionVerdict()
+    data class NotLaunchedVerdict(private val testsCount: Int) : SubmissionVerdict()
 }

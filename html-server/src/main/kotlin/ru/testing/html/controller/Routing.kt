@@ -67,7 +67,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configura
                 if (part is PartData.FormItem) {
                     if (part.name == "chooseLanguage") {
                         language = when (part.value) {
-                            "cpp" -> CPP
+                            "cpp" -> Cpp
                             "java" -> Java
                             else -> throw IllegalArgumentException("Unknown language: ${part.value}")
                         }

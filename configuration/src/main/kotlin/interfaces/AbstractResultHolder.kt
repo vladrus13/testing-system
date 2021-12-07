@@ -38,6 +38,14 @@ interface AbstractResultHolder {
     fun sendVerdict(submissionId: Long, verdict: SubmissionVerdict.RunningVerdict)
 
     /**
+     * Sends compilation took too much time verdict
+     *
+     * @param submissionId id of the submission
+     * @param verdict running verdict submission
+     */
+    fun sendVerdict(submissionId: Long, verdict: SubmissionVerdict.CompilationTimeLimit)
+
+    /**
      * Sends verdict of test to running task
      *
      * @param submissionId id of the submission

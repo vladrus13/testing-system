@@ -51,6 +51,16 @@ class ResultHolder : AbstractResultHolder {
     }
 
     /**
+     * Sends a compilation time exceeded verdict
+     *
+     * @param submissionId id of the submission
+     * @param verdict compilation time exceeded verdict
+     */
+    override fun sendVerdict(submissionId: Long, verdict: SubmissionVerdict.CompilationTimeLimit) {
+        holder[submissionId] = verdict
+    }
+
+    /**
      * Sends running task verdict
      *
      * @param submissionId id of the submission

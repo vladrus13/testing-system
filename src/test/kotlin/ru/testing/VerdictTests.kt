@@ -1,23 +1,157 @@
 package ru.testing
 
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import ru.testing.TestUtils.TestTask.*
-import ru.testing.polygon.submission.CPP
+import ru.testing.TestUtils.runTask
+import ru.testing.VerdictTests.CorrectPrograms.correctCpp
+import ru.testing.VerdictTests.CorrectPrograms.correctJava
+import ru.testing.polygon.submission.Cpp
+import ru.testing.polygon.submission.Java
+import ru.testing.testlib.task.SubmissionVerdict
+import ru.testing.testlib.task.TestVerdict
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
+@Execution(ExecutionMode.CONCURRENT)
 class VerdictTests {
-    @Test
-    fun correctVerdict() = runBlocking {
-        TestUtils.runTask(task = `A + B`, language = CPP, source = """
+    private object CorrectPrograms {
+        fun correctCpp(variables: Int) = """
             #include <iostream>
-            
+
             int main() {
-                int a, b;
-                std::cin >> a >> b;
-                std::cout << a + b;
+                int ${(1..variables).joinToString(", ") { "a$it" }};
+                std::cin >> ${(1..variables).joinToString(" >> ") { "a$it" }};
+                std::cout << ${(1..variables).joinToString(" + ") { "a$it" }};
             }
-        """.trimIndent()).let { println(it) }
+        """.trimIndent()
+
+        fun correctJava(numbers: Int) = """
+            import java.util.Scanner;
+
+            public class Source {
+                public static void main(String[] args) {
+                    Scanner sc = new Scanner(System.in);
+                    final int ${(1..numbers).joinToString(", ") { "a$it = sc.nextInt()" }};
+                    sc.close();
+                    System.out.println(${(1..numbers).joinToString(" + ") { "a$it" }});
+                }
+            }
+
+        """.trimIndent()
+
+    }
+
+    @Nested
+    inner class Ok {
+        private fun SubmissionVerdict.allOk(expectedCount: Int) {
+            Assertions.assertTrue(
+                this is SubmissionVerdict.RunningVerdict
+                        && this.tests.size == expectedCount
+                        && this.tests.all { it == TestVerdict.OK },
+                toString())
+        }
+
+        @Test
+        fun cpp() = runBlocking {
+            runTask(task = `A + B`, language = Cpp, source = correctCpp(2)).allOk(4)
+            runTask(task = `A + B + C`, language = Cpp, source = correctCpp(3)).allOk(6)
+        }
+
+        @Test
+        fun java() = runBlocking {
+            runTask(task = `A + B`, language = Java, source = correctJava(2)).allOk(4)
+            runTask(task = `A + B + C`, language = Java, source = correctJava(3)).allOk(6)
+        }
+    }
+
+    @Nested
+    inner class CompilationError {
+        @Test
+        fun cpp() = runBlocking {
+            runTask(
+                task = `A + B`, language = Cpp,
+                source = correctCpp(2).replace("iostream", "lalala")
+            ).assertCorrectness()
+        }
+
+        @Test
+        fun java() = runBlocking {
+            runTask(
+                task = `A + B`, language = Java,
+                source = correctJava(2).replace("class", "lalala")
+            ).assertCorrectness()
+        }
+
+        private fun SubmissionVerdict.assertCorrectness() {
+            Assertions.assertTrue(this is SubmissionVerdict.CompilationError, toString())
+        }
+    }
+
+    @Nested
+    inner class TimeLimit {
+        private fun makeTL(code: String) = code.replaceFirst("}", "while (true) {}}").also { println(it) }
+
+        @Test
+        fun cpp() = runBlocking {
+            runTask(task = `A + B`, language = Cpp, source = makeTL(correctCpp(2))).assertCorrectness()
+        }
+
+        @Test
+        fun java() = runBlocking {
+            runTask(task = `A + B`, language = Java, source = makeTL(correctJava(2))).assertCorrectness()
+        }
+
+        private fun SubmissionVerdict.assertCorrectness() {
+            Assertions.assertTrue(
+                this is SubmissionVerdict.RunningVerdict && tests.all { it is TestVerdict.TL }, toString()
+            )
+        }
+    }
+
+    @Nested
+    inner class RuntimeError {
+        private fun makeRE(code: String) = code.replace("+", "+ 2 / (a1 - a1) +")
+
+        @Test
+        fun cpp() = runBlocking {
+            runTask(task = `A + B`, language = Cpp, source = makeRE(correctCpp(2))).assertCorrectness()
+        }
+
+        @Test
+        fun java() = runBlocking {
+            runTask(task = `A + B`, language = Java, source = makeRE(correctJava(2))).assertCorrectness()
+        }
+
+        private fun SubmissionVerdict.assertCorrectness() {
+            Assertions.assertTrue(
+                this is SubmissionVerdict.RunningVerdict && tests.all { it is TestVerdict.RE }, toString()
+            )
+        }
+    }
+
+    @Nested
+    inner class WrongAnswer {
+        private fun makeWA(code: String) = code.replace("+", "+ 1 +")
+
+        @Test
+        fun cpp() = runBlocking {
+            runTask(task = `A + B`, language = Cpp, source = makeWA(correctCpp(2))).assertCorrectness()
+        }
+
+        @Test
+        fun java() = runBlocking {
+            runTask(task = `A + B`, language = Java, source = makeWA(correctJava(2))).assertCorrectness()
+        }
+
+        private fun SubmissionVerdict.assertCorrectness() {
+            Assertions.assertTrue(
+                this is SubmissionVerdict.RunningVerdict && tests.all { it is TestVerdict.WA }, toString()
+            )
+        }
     }
 }
