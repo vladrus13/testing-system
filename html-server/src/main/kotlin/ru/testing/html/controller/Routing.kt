@@ -1,15 +1,19 @@
 package ru.testing.html.controller
 
 import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.features.*
 import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.sessions.*
 import io.ktor.util.pipeline.*
 import kotlinx.css.*
 import kotlinx.html.*
+import ru.testing.html.views.loginView
 import ru.testing.html.views.utils.Viewer
 import ru.testing.polygon.database.ResultHolder
 import ru.testing.polygon.queue.TestingQueue
@@ -34,23 +38,81 @@ suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
  *
  */
 fun Application.module() {
+    install(Sessions) {
+        cookie<UserIdPrincipal>("user_session") {
+            // Configure session authentication
+            cookie.path = "/"
+            cookie.maxAgeInSeconds = 60 * 60  // 1 hour
+        }
+    }
+
+    install(Authentication) {
+        session<UserIdPrincipal>("auth_session") {
+            validate { session ->
+                session  // TODO: maybe we need to store user id somehow?
+            }
+            challenge {
+                call.respondRedirect("/login")
+            }
+        }
+
+        form("auth_form") {
+            userParamName = "username"
+            passwordParamName = "password"
+            validate { credentials ->
+                if (credentials.name == "admin" && credentials.password == "12345") {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
+                }
+            }
+            challenge {
+                call.respondHtml {
+                    Viewer.getHTML(html = this, body = {
+                        loginView()
+                        div {
+                            style = "color:red;"
+                            text("Incorrect username or password")
+                        }
+                    })
+                }
+            }
+        }
+    }
+
     routing {
         get("/styles.css") {
             call.respondCss { testingSystemCss() }
         }
-        get("/") {
-            call.respondHtml(block = HTML::indexView)
+        get("/logout") {
+            call.sessions.clear<UserIdPrincipal>()
+            call.respondRedirect("/login")
         }
-        get("/chooseFile") {
-            call.respondHtml { Viewer.getHTML(html = this, body = { chooseFileView() }) }
+        authenticate("auth_session") {
+            get("/") {
+                call.respondHtml(block = HTML::indexView)
+            }
+            get("/chooseFile") {
+                call.respondHtml { Viewer.getHTML(html = this, body = { chooseFileView() }) }
+            }
+            post("/chooseFile") {
+                receiveTask()
+            }
+            get("/submission/{id}") {
+                val id = call.parameters["id"]!!.toLong()
+                val result = ResultHolder.getVerdict(id)
+                call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
+            }
         }
-        post("/chooseFile") {
-            receiveTask()
+        authenticate("auth_form") {
+            post("/login") {
+                val principal = call.principal<UserIdPrincipal>()
+                call.sessions.set(principal)
+                call.respondRedirect("/")
+            }
         }
-        get("/submission/{id}") {
-            val id = call.parameters["id"]!!.toLong()
-            val result = ResultHolder.getVerdict(id)
-            call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
+        get("/login") {
+            call.respondHtml { Viewer.getHTML(html = this, body = { loginView() }) }
         }
     }
 }
