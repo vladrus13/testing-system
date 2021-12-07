@@ -53,13 +53,9 @@ sealed class TestVerdict {
 
     /**
      * TL - time limit in the test
-     *
-     * @property time how much participant takes (can be less than real)
      */
-    class TL(private val time: Long) : TestVerdict() {
-        override fun toString(): String {
-            return "Time limit. Time: $time"
-        }
+    object TL : TestVerdict() {
+        override fun toString(): String = "Time limit."
 
         override fun toRow(index: Int, table: TABLE) {
             table.tr(classes = "tl_verdict") {

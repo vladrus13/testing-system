@@ -38,6 +38,8 @@ class Executors(count: Int) : AbstractExecutors {
                     it.run(configuration)
                 } catch (e: Throwable) {
                     e.printStackTrace()
+                } finally {
+
                 }
             }
         }
