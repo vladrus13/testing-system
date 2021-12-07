@@ -8,10 +8,9 @@ version = "0.0.1"
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven") }
 }
 
 dependencies {
     implementation(project(":testlib"))
-    implementation(project(":configuration"))
-    implementation(kotlin("reflect"))
 }

@@ -1,14 +1,14 @@
-package ru.testing.html.controller
+package ru.testing.html.views
 
 import kotlinx.html.*
-import ru.testing.tasks.TasksHolder
+import ru.testing.testlib.task.Task
 
-internal fun BODY.chooseFileView() {
+internal fun BODY.chooseFileView(tasksHolder: Map<Long, Task>) {
     form(method = FormMethod.post, encType = FormEncType.multipartFormData) {
         acceptCharset = "utf-8"
         select {
             this.name = "chooseTask"
-            for (tasks in TasksHolder.map) {
+            for (tasks in tasksHolder) {
                 option {
                     value = tasks.key.toString()
                     text(tasks.value::class.java.simpleName)

@@ -1,6 +1,9 @@
 package ru.testing.polygon.server
 
+import EnvironmentConfiguration
+import interfaces.AbstractExecutors
 import java.util.concurrent.Executors
+
 
 /**
  * Executor servers. Contains executors to tests solutions
@@ -9,7 +12,7 @@ import java.util.concurrent.Executors
  *
  * @param count count of executors
  */
-class Executors(count: Int) {
+class Executors(count: Int) : AbstractExecutors {
     private val list: List<MonoExecutor> = MutableList(count) { MonoExecutor() }
     private val executorService = Executors.newFixedThreadPool(count)
 
@@ -17,7 +20,7 @@ class Executors(count: Int) {
      * Stops server. All executors try to stop taking tasks, after this all threads will shut down
      *
      */
-    fun stop() {
+    override fun stop() {
         list.forEach {
             it.stop()
         }
@@ -28,11 +31,11 @@ class Executors(count: Int) {
      * Runs server. It starts handling tasks
      *
      */
-    fun run() {
-        list.forEach {
+    override fun run(configuration: EnvironmentConfiguration) {
+        for (it in list) {
             executorService.submit {
                 try {
-                    it.run()
+                    it.run(configuration)
                 } catch (e: Throwable) {
                     e.printStackTrace()
                 }
