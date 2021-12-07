@@ -5,12 +5,12 @@ import kotlinx.html.td
 import kotlinx.html.tr
 
 /**
- * Verdict we can get on testing
+ * Verdict we can get for a test
  *
  */
 sealed class TestVerdict {
     /**
-     * OK - correct test
+     * OK - correct answer
      */
     object OK : TestVerdict() {
         override fun toString(): String {
@@ -30,13 +30,13 @@ sealed class TestVerdict {
     }
 
     /**
-     * WA - wrong answer on this test
+     * WA - wrong answer in the test
      *
-     * @property s some addition information (like, "Different on line 99")
+     * @property description some additional information (like, "Different on line 99")
      */
-    class WA(private val s: String) : TestVerdict() {
+    class WA(private val description: String) : TestVerdict() {
         override fun toString(): String {
-            return "Wrong answer! $s"
+            return "Wrong answer! $description"
         }
 
         override fun toRow(index: Int, table: TABLE) {
@@ -52,9 +52,9 @@ sealed class TestVerdict {
     }
 
     /**
-     * TL - time limit on this test
+     * TL - time limit in the test
      *
-     * @property time how much participant take (can be less than real)
+     * @property time how much participant takes (can be less than real)
      */
     class TL(private val time: Long) : TestVerdict() {
         override fun toString(): String {
@@ -101,10 +101,8 @@ sealed class TestVerdict {
      * NL - not launcher on this test
      *
      */
-    class NL : TestVerdict() {
-        override fun toString(): String {
-            return "Not launched"
-        }
+    object NL : TestVerdict() {
+        override fun toString(): String = "Not launched"
 
         override fun toRow(index: Int, table: TABLE) {
             table.tr(classes = "nl_verdict") {
@@ -121,10 +119,10 @@ sealed class TestVerdict {
     abstract override fun toString(): String
 
     /**
-     * Add to table info about verdict
+     * Adds verdict info to the table
      *
-     * @param index index of test
-     * @param table table
+     * @param index index of the test
+     * @param table the table
      */
     abstract fun toRow(index: Int, table: TABLE)
 }

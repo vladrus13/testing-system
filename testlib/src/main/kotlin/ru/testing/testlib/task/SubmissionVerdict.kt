@@ -23,7 +23,7 @@ sealed class SubmissionVerdict {
     /**
      * Not launched verdict
      *
-     * @property countTests count of tests
+     * @property testsCount count of tests
      */
-    class NotLaunchedVerdict(private val countTests: Int) : SubmissionVerdict()
+    class NotLaunchedVerdict(private val testsCount: Int) : SubmissionVerdict()
 }

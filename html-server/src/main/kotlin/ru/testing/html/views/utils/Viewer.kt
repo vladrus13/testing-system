@@ -1,4 +1,4 @@
-package ru.testing.html.view
+package ru.testing.html.views.utils
 
 import kotlinx.html.*
 

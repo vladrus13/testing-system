@@ -20,7 +20,7 @@ class TasksHolder {
             val result: HashMap<Long, Task> = hashMapOf()
             val url = TasksHolder::class.java.getResource("/tasks.xml")
             if (url == null || url.file == null) {
-                // TDOO some?
+                // TODO some?
             } else {
                 val documentBuilderFactory = DocumentBuilderFactory.newInstance()
                 documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
@@ -32,9 +32,8 @@ class TasksHolder {
 
                 val converter: Node.(String) -> String = { clazz ->
                     val attributes = attributes
-                    val real =
-                        attributes.getNamedItem(clazz)
-                            ?: throw NullPointerException("Node with name $clazz can't be null")
+                    val real = attributes.getNamedItem(clazz)
+                        ?: throw NullPointerException("Node with name $clazz can't be null") // todo really NPE, what?
                     real.normalize()
                     real.nodeValue
                 }
@@ -47,6 +46,7 @@ class TasksHolder {
                         result[id] = clazz.java.getDeclaredConstructor().newInstance()
                     } catch (e: ClassCastException) {
                         // ignore
+                        // todo why ignore
                     }
                 }
             }

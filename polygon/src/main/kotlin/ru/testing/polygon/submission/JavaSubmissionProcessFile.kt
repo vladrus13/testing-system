@@ -8,7 +8,7 @@ import kotlin.io.path.absolutePathString
  *
  */
 class JavaSubmissionProcessFile : CompileRunSubmissionProcessFile() {
-    override fun getCompileCommand(path: Path, name: String): List<String> = listOf("javac", path.absolutePathString())
+    override fun getCompilingCommand(path: Path, name: String): List<String> = listOf("javac", path.absolutePathString())
 
-    override fun getRunCommand(name: String): List<String> = listOf("java", "-cp", ".", name)
+    override fun getRunningCommand(name: String): List<String> = listOf("java", "-cp", ".", name)
 }

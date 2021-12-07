@@ -3,18 +3,18 @@ package ru.testing.polygon.server
 import java.util.concurrent.Executors
 
 /**
- * Executor server. Contain executors what tests solutions
+ * Executor servers. Contains executors to tests solutions
  *
- * @constructor create server
+ * @constructor creates server
  *
  * @param count count of executors
  */
-class Server(count: Int) {
+class Executors(count: Int) {
     private val list: List<MonoExecutor> = MutableList(count) { MonoExecutor() }
     private val executorService = Executors.newFixedThreadPool(count)
 
     /**
-     * Stop server. All executors trying to stop taking tasks, after this all threads will shut down
+     * Stops server. All executors try to stop taking tasks, after this all threads will shut down
      *
      */
     fun stop() {
@@ -25,7 +25,7 @@ class Server(count: Int) {
     }
 
     /**
-     * Run server. It starts takes a tasks
+     * Runs server. It starts handling tasks
      *
      */
     fun run() {
@@ -33,7 +33,7 @@ class Server(count: Int) {
             executorService.submit {
                 try {
                     it.run()
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     e.printStackTrace()
                 }
             }
