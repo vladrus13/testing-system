@@ -29,7 +29,7 @@ class MonoExecutor {
             val temporaryDirectory = Files.createTempDirectory(rootPath, "temp")
             val solutionFile = temporaryDirectory.resolve(newTask.title)
             solutionFile.toFile().printWriter(StandardCharsets.UTF_8).use { out ->
-                out.println(newTask.listing)
+                out.println(newTask.source)
             } // todo: is it just writing to the file?
             // todo: why do you need to create a directory for the only file
             newTask.processFile.runSolverFile(newTask.id, solutionFile, newTask.task)

@@ -13,15 +13,15 @@ class SubmissionsFactory {
         /**
          * Get instance of task
          *
-         * @param title title of task
-         * @param listing listing of task
+         * @param title task title
+         * @param source solution source
          * @param fileType submission process file
          * @param task task
-         * @return instance of task
+         * @return task instance
          */
-        fun getInstance(title: String, listing: String, fileType: SubmissionProcessFile, task: Task): SubmissionFile {
+        fun getInstance(title: String, source: String, fileType: SubmissionProcessFile, task: Task): SubmissionFile {
             val id = ResultHolder.addTask(task)
-            return SubmissionFile(id, title, listing, fileType, task)
+            return SubmissionFile(id, title, source, fileType, task)
         }
     }
 }

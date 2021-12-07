@@ -56,47 +56,48 @@ fun Application.module() {
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask() {
-    var submissionProcessFile: SubmissionProcessFile = CPPSubmissionProcessFile()
-    val multipart = call.receiveMultipart()
-    var title = "Source"
-    val (text, task) = run {
-        var text: String? = null
-        var task: Task? = null
-        multipart.forEachPart { part ->
-            if (part is PartData.FormItem) {
-                if (part.name == "chooseLanguage") {
-                    submissionProcessFile = when (part.value) {
-                        "cpp" -> CPPSubmissionProcessFile()
-                        "java" -> JavaSubmissionProcessFile()
-                        else -> CPPSubmissionProcessFile() // todo: why cpp
+    try {
+        var submissionProcessFile: SubmissionProcessFile = CPPSubmissionProcessFile()
+        val multipart = call.receiveMultipart()
+        var title = "Source"
+        val (source, task) = run {
+            var source: String? = null
+            var task: Task? = null
+            multipart.forEachPart { part ->
+                if (part is PartData.FormItem) {
+                    if (part.name == "chooseLanguage") {
+                        submissionProcessFile = when (part.value) {
+                            "cpp" -> CPPSubmissionProcessFile()
+                            "java" -> JavaSubmissionProcessFile()
+                            else -> throw IllegalArgumentException("Unknown language: ${part.value}")
+                        }
+                    }
+                    if (part.name == "chooseTask") {
+                        task = TasksHolder.map[part.value.toLongOrNull()
+                            ?: throw IllegalArgumentException("Unknown task id: ${part.value}")]
                     }
                 }
-                if (part.name == "chooseTask") {
-                    task = TasksHolder.map[part.value.toLong()] // todo: what if not long
+                if (part is PartData.FileItem) {
+                    part.streamProvider().use { stream ->
+                        title = part.originalFileName ?: throw IllegalArgumentException("File name not provided")
+                        source = stream.bufferedReader().use { it.readText() }
+                    }
                 }
+                part.dispose()
             }
-            if (part is PartData.FileItem) {
-                part.streamProvider().use { stream ->
-                    title = part.originalFileName!! // todo what if null?
-                    text = stream.bufferedReader().use { it.readText() }
-                }
-            }
-            part.dispose()
+            source to task
         }
-        text to task
-    }
-    when {
-        task == null -> call.respondText("Ban!!!")
-        text == null -> call.respondText("Ban!!!")
-        else -> {
-            val submission = SubmissionsFactory.getInstance(
-                title = title,
-                listing = text,
-                fileType = submissionProcessFile,
-                task = task
-            )
-            TestingQueue.add(submission)
-            call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
-        }
+        require(task != null) { "Task is not specified" }
+        require(source != null) { "Source is not specified" }
+        val submission = SubmissionsFactory.getInstance(
+            title = title,
+            source = source,
+            fileType = submissionProcessFile,
+            task = task
+        )
+        TestingQueue.add(submission)
+        call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
+    } catch (e: IllegalArgumentException) {
+        call.respondText(e.message ?: "Bad submission")
     }
 }
