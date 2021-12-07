@@ -67,7 +67,7 @@ abstract class SubmissionProcessFile {
             val error = process.errorStream.use {
                 it.bufferedReader().use { it1 ->
                     it1.readText()
-                } // todo are you trying just to read file?
+                }
             }
             return OutputProcessFile(
                 error = error,
@@ -77,7 +77,7 @@ abstract class SubmissionProcessFile {
             val error = process.errorStream.use {
                 it.bufferedReader().use { it1 ->
                     it1.readText()
-                } // todo are you trying just to read file?
+                }
             }
             val output = getOutput(outputFile)
             return OutputProcessFile(

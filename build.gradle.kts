@@ -3,7 +3,7 @@ plugins {
     kotlin("jvm") version "1.5.31"
 }
 
-// TODO make childs group and version dependencies
+// TODO make children group and version dependencies
 
 group = "ru.testing"
 version = "0.0.1"
