@@ -1,4 +1,4 @@
-package ru.testing.polygon.submission
+package interfaces
 
 import ru.testing.testlib.task.Task
 

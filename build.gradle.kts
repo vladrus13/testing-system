@@ -22,4 +22,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.6")
     implementation(project("html-server"))
     implementation(project("polygon"))
+    implementation(project("configuration"))
+    implementation(project("tasks"))
+    implementation(project("testlib"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
 }

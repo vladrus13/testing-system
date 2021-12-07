@@ -1,5 +1,6 @@
-package ru.testing.polygon.submission
+package interfaces
 
+import EnvironmentConfiguration
 import ru.testing.testlib.limits.Limits
 import ru.testing.testlib.task.Task
 import java.nio.charset.StandardCharsets
@@ -95,5 +96,5 @@ abstract class SubmissionProcessFile {
      * @param task task to test
      * @return list of received verdicts
      */
-    abstract fun runSolverFile(idSubmission: Long, path: Path, task: Task)
+    abstract fun runSolverFile(configuration: EnvironmentConfiguration, idSubmission: Long, path: Path, task: Task)
 }
