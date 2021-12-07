@@ -11,28 +11,29 @@ import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
 
 /**
- * Mono thread executor. Take tasks and execute it
+ * Mono thread executor. Takes tasks and executes it
  *
  */
 class MonoExecutor {
 
-    private var isExited = false
+    private var hasExited = false
 
     /**
      * Starts executor
      *
      */
     fun run() {
-        while (!isExited) {
+        while (!hasExited) {
             val newTask = TestingQueue.get() ?: continue
             val rootPath = TestingConfiguration.DEPLOY_DIRECTORY
-            val templateDirectory = Files.createTempDirectory(rootPath, "temp")
-            val solveFile = templateDirectory.resolve("${newTask.title}")
-            solveFile.toFile().printWriter(StandardCharsets.UTF_8).use { out ->
+            val temporaryDirectory = Files.createTempDirectory(rootPath, "temp")
+            val solutionFile = temporaryDirectory.resolve(newTask.title)
+            solutionFile.toFile().printWriter(StandardCharsets.UTF_8).use { out ->
                 out.println(newTask.listing)
-            }
-            newTask.fileType.runSolveFile(newTask.id, solveFile, newTask.task)
-            Files.walkFileTree(templateDirectory, object : FileVisitor<Path> {
+            } // todo: is it just writing to the file?
+            // todo: why do you need to create a directory for the only file
+            newTask.processFile.runSolverFile(newTask.id, solutionFile, newTask.task)
+            Files.walkFileTree(temporaryDirectory, object : FileVisitor<Path> {
                 override fun preVisitDirectory(dir: Path?, attrs: BasicFileAttributes?): FileVisitResult {
                     return FileVisitResult.CONTINUE
                 }
@@ -55,10 +56,10 @@ class MonoExecutor {
     }
 
     /**
-     * Try to stop executor (it wouldn't take any tasks anymore). It can take some time
+     * Tries to stop executor (it wouldn't take any tasks anymore). It can take some time
      *
      */
     fun stop() {
-        isExited = true
+        hasExited = true
     }
 }

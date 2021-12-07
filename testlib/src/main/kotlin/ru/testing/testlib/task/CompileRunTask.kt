@@ -3,7 +3,7 @@ package ru.testing.testlib.task
 import ru.testing.testlib.limits.Limits
 
 /**
- * Task which compile and run
+ * Task to compile and run
  *
  * @property compile limits to compile
  * @property run limits to run

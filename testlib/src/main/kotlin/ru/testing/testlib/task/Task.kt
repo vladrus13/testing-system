@@ -3,7 +3,7 @@ package ru.testing.testlib.task
 import ru.testing.testlib.limits.Limits
 
 /**
- * Task class. Contain information about task
+ * Task class. Contains information about the task
  *
  * @property tests tests of task
  * @constructor constructor of task

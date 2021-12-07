@@ -8,8 +8,8 @@ import kotlin.io.path.absolutePathString
  *
  */
 class CPPSubmissionProcessFile : CompileRunSubmissionProcessFile() {
-    override fun getCompileCommand(path: Path, name: String): List<String> =
+    override fun getCompilingCommand(path: Path, name: String): List<String> =
         listOf("g++", path.absolutePathString(), "-o", name)
 
-    override fun getRunCommand(name: String): List<String> = listOf("./${name}")
+    override fun getRunningCommand(name: String): List<String> = listOf("./${name}")
 }

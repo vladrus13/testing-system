@@ -8,31 +8,31 @@ import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * Result holder. Temporary solution. Will be replaced by database
+ * Result holder. Temporary solution. Will be replaced by a database
  *
  */
 class ResultHolder {
     companion object {
         /**
-         * Holds all results by it id
+         * Holds all results by their ids
          */
         private val holder: ConcurrentMap<Long, SubmissionVerdict> = ConcurrentHashMap()
 
         private val futureId: AtomicLong = AtomicLong(0)
 
         /**
-         * Get verdict of submission
+         * Gets a verdict of submission
          *
-         * @param idSubmission id of submission
+         * @param submissionId id of submission
          * @return verdict
          */
-        fun getVerdict(idSubmission: Long) = holder[idSubmission]
+        fun getVerdict(submissionId: Long) = holder[submissionId]
 
         /**
-         * Add task to holder
+         * Adds a task to holder
          *
          * @param task task
-         * @return id of submission
+         * @return id of the submission
          */
         fun addTask(task: Task): Long {
             val id = futureId.incrementAndGet()
@@ -41,36 +41,36 @@ class ResultHolder {
         }
 
         /**
-         * Send compilation error verdict
+         * Sends a compilation error verdict
          *
-         * @param idSubmission id of submission
+         * @param submissionId id of the submission
          * @param verdict compilation error verdict
          */
-        fun sendVerdict(idSubmission: Long, verdict: SubmissionVerdict.CompilationError) {
-            holder[idSubmission] = verdict
+        fun sendVerdict(submissionId: Long, verdict: SubmissionVerdict.CompilationError) {
+            holder[submissionId] = verdict
         }
 
         /**
-         * Send running task verdict
+         * Sends running task verdict
          *
-         * @param idSubmission id of submission
+         * @param submissionId id of the submission
          * @param verdict running verdict submission
          */
-        fun sendVerdict(idSubmission: Long, verdict: SubmissionVerdict.RunningVerdict) {
-            holder[idSubmission] = verdict
+        fun sendVerdict(submissionId: Long, verdict: SubmissionVerdict.RunningVerdict) {
+            holder[submissionId] = verdict
         }
 
         /**
-         * Send verdict of test to running task
+         * Sends verdict of test to running task
          *
-         * @param idSubmission id of submission
-         * @param idTest id of test
-         * @param verdict verdict of test
+         * @param submissionId id of the submission
+         * @param testId id of the test
+         * @param verdict verdict of the test
          */
-        fun sendVerdict(idSubmission: Long, idTest: Int, verdict: TestVerdict) {
-            val task = holder[idSubmission]
+        fun sendVerdict(submissionId: Long, testId: Int, verdict: TestVerdict) {
+            val task = holder[submissionId]
             if (task is SubmissionVerdict.RunningVerdict) {
-                task.tests[idTest] = verdict
+                task.tests[testId] = verdict
             }
         }
     }

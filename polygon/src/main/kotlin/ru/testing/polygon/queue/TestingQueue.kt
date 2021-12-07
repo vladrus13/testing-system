@@ -4,7 +4,7 @@ import ru.testing.polygon.submission.SubmissionFile
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
- * Testing queue. Contain all tasks what we must test
+ * Testing queue. Contains all tasks to test
  *
  */
 class TestingQueue {
@@ -12,7 +12,7 @@ class TestingQueue {
         private val queue: ConcurrentLinkedQueue<SubmissionFile> = ConcurrentLinkedQueue<SubmissionFile>()
 
         /**
-         * Add task to the queue
+         * Adds a task to the queue
          *
          * @param task task
          */
@@ -21,7 +21,7 @@ class TestingQueue {
         }
 
         /**
-         * Get first task from queue and remove it from queue
+         * Gets the first task from queue and removes it from queue
          *
          * @return first task
          */

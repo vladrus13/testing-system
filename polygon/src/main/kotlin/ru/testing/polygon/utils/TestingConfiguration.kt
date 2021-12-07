@@ -14,13 +14,9 @@ class TestingConfiguration {
             load(TestingConfiguration::class.java.getResourceAsStream("/testing.properties"))
         }
 
-        // TODO make better. let, seriously?
         /**
-         * Directory where we test all solutions
+         * Directory where to test all solutions
          */
-        val DEPLOY_DIRECTORY: Path = Path.of(properties.getProperty("DEPLOY_DIRECTORY")).let {
-            it.createDirectories()
-            it
-        }
+        val DEPLOY_DIRECTORY: Path = Path.of(properties.getProperty("DEPLOY_DIRECTORY")).also { it.createDirectories() }
     }
 }

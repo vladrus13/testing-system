@@ -7,7 +7,7 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 /**
- * Submission type. Run solution we get
+ * Submission type. Runs solution we get
  *
  */
 abstract class SubmissionProcessFile {
@@ -67,7 +67,7 @@ abstract class SubmissionProcessFile {
             val error = process.errorStream.use {
                 it.bufferedReader().use { it1 ->
                     it1.readText()
-                }
+                } // todo are you trying just to read file?
             }
             return OutputProcessFile(
                 error = error,
@@ -77,7 +77,7 @@ abstract class SubmissionProcessFile {
             val error = process.errorStream.use {
                 it.bufferedReader().use { it1 ->
                     it1.readText()
-                }
+                } // todo are you trying just to read file?
             }
             val output = getOutput(outputFile)
             return OutputProcessFile(
@@ -89,11 +89,11 @@ abstract class SubmissionProcessFile {
     }
 
     /**
-     * Run solve of file on tests
+     * Runa solver file on tests
      *
-     * @param path path to solve
-     * @param task task we must test
-     * @return list of verdicts
+     * @param path path to solver
+     * @param task task to test
+     * @return list of received verdicts
      */
-    abstract fun runSolveFile(idSubmission: Long, path: Path, task: Task)
+    abstract fun runSolverFile(idSubmission: Long, path: Path, task: Task)
 }
