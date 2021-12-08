@@ -3,7 +3,9 @@ package ru.testing
 import SimpleEnvironmentConfiguration
 import ru.testing.polygon.submission.ProgrammingLanguage
 import kotlinx.coroutines.delay
+import ru.testing.polygon.database.DatabaseInitializer
 import ru.testing.polygon.database.ResultHolder
+import ru.testing.polygon.database.UserHolder
 import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.server.Executors
 import ru.testing.polygon.submission.Cpp
@@ -30,7 +32,7 @@ object TestUtils {
         language: ProgrammingLanguage,
         source: String,
     ): SubmissionVerdict {
-        val configuration = SimpleEnvironmentConfiguration(TasksHolder(), TestingQueue(), Executors(1), ResultHolder())
+        val configuration = SimpleEnvironmentConfiguration(TasksHolder(), TestingQueue(), Executors(1), ResultHolder(), UserHolder(), DatabaseInitializer())
         val extension = when (language) {
             Cpp -> "cpp"
             Java -> "java"

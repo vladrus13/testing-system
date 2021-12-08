@@ -1,6 +1,4 @@
-import interfaces.AbstractExecutors
-import interfaces.AbstractResultHolder
-import interfaces.AbstractTestingQueue
+import interfaces.*
 import ru.testing.testlib.task.Task
 
 interface EnvironmentConfiguration {
@@ -8,4 +6,6 @@ interface EnvironmentConfiguration {
     val testingQueue: AbstractTestingQueue
     val executors: AbstractExecutors
     val resultHolder: AbstractResultHolder
+    val userHolder: AbstractUserHolder
+    val databaseInitializer: AbstractDatabaseInitializer
 }
