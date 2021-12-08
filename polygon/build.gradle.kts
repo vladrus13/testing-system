@@ -14,4 +14,5 @@ repositories {
 dependencies {
     implementation(project(":tasks"))
     implementation(project(":testlib"))
+    implementation(project(":configuration"))
 }

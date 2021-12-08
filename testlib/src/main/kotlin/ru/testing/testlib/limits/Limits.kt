@@ -8,14 +8,14 @@ package ru.testing.testlib.limits
  */
 class Limits(
     var timeLimitMilliseconds: Long = 1000L,
-    val memoryLimitBytes: Long = 256 * 1024L
+    val memoryLimitBytes: Long = 256 * 1024L, // todo use
 ) {
     companion object {
         /**
          * On compilation limits
          */
         val COMPILATION_LIMITS = Limits(
-            timeLimitMilliseconds = 5000L
+            timeLimitMilliseconds = 30000L
         )
 
         /**

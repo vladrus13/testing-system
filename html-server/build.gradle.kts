@@ -19,4 +19,5 @@ dependencies {
     implementation(project(":polygon"))
     implementation(project(":testlib"))
     implementation(project(":tasks"))
+    implementation(project(":configuration"))
 }

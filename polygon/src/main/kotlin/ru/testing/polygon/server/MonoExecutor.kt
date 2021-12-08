@@ -1,5 +1,6 @@
 package ru.testing.polygon.server
 
+import EnvironmentConfiguration
 import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.utils.TestingConfiguration
 import java.io.IOException
@@ -14,7 +15,7 @@ import java.nio.file.attribute.BasicFileAttributes
  * Mono thread executor. Takes tasks and executes it
  *
  */
-class MonoExecutor {
+class MonoExecutor() {
 
     private var hasExited = false
 
@@ -22,17 +23,14 @@ class MonoExecutor {
      * Starts executor
      *
      */
-    fun run() {
+    fun run(configuration: EnvironmentConfiguration) = with(configuration) {
         while (!hasExited) {
-            val newTask = TestingQueue.get() ?: continue
+            val newTask = testingQueue.get() ?: continue
             val rootPath = TestingConfiguration.DEPLOY_DIRECTORY
             val temporaryDirectory = Files.createTempDirectory(rootPath, "temp")
             val solutionFile = temporaryDirectory.resolve(newTask.title)
-            solutionFile.toFile().printWriter(StandardCharsets.UTF_8).use { out ->
-                out.println(newTask.source)
-            } // todo: is it just writing to the file?
-            // todo: why do you need to create a directory for the only file
-            newTask.processFile.runSolverFile(newTask.id, solutionFile, newTask.task)
+            solutionFile.toFile().writeText(newTask.source)
+            newTask.processFile.runSolverFile(configuration, newTask.id, solutionFile, newTask.task)
             Files.walkFileTree(temporaryDirectory, object : FileVisitor<Path> {
                 override fun preVisitDirectory(dir: Path?, attrs: BasicFileAttributes?): FileVisitResult {
                     return FileVisitResult.CONTINUE

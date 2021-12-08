@@ -1,9 +1,11 @@
-package ru.testing.polygon.submission
+package interfaces
 
+import EnvironmentConfiguration
 import ru.testing.testlib.limits.Limits
 import ru.testing.testlib.task.Task
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 /**
@@ -50,7 +52,7 @@ abstract class SubmissionProcessFile {
         directory: Path,
         input: String? = null,
         limits: Limits
-    ): OutputProcessFile {
+    ): OutputProcessFile? {
         val processBuilder = ProcessBuilder(command)
         processBuilder.directory(directory.toFile())
         if (input != null) {
@@ -61,8 +63,21 @@ abstract class SubmissionProcessFile {
         val outputFile = directory.resolve("output.txt")
         processBuilder.redirectOutput(outputFile.toFile())
         val process = processBuilder.start()
+        val startTime = Instant.now().toEpochMilli()
         process.waitFor(limits.timeLimitMilliseconds * 3 / 2, TimeUnit.MILLISECONDS)
-        val exitValue = process.exitValue()
+        val exitValue = try {
+            process.exitValue()
+        } catch (e: IllegalThreadStateException) {
+            if (e.message == "process hasn't exited") {
+                process.destroyForcibly()
+                return null
+            }
+            throw e
+        }
+        val elapsed = Instant.now().toEpochMilli() - startTime
+        if (elapsed > limits.timeLimitMilliseconds) {
+            return null
+        }
         if (exitValue != 0) {
             val error = process.errorStream.use {
                 it.bufferedReader().use { it1 ->
@@ -95,5 +110,5 @@ abstract class SubmissionProcessFile {
      * @param task task to test
      * @return list of received verdicts
      */
-    abstract fun runSolverFile(idSubmission: Long, path: Path, task: Task)
+    abstract fun runSolverFile(configuration: EnvironmentConfiguration, submissionId: Long, path: Path, task: Task)
 }
