@@ -88,6 +88,9 @@ fun Application.module() {
             call.sessions.clear<UserIdPrincipal>()
             call.respondRedirect("/login")
         }
+        get("/login") {
+            call.respondHtml { Viewer.getHTML(html = this, body = { loginView() }) }
+        }
         authenticate("auth_session") {
             get("/") {
                 call.respondHtml(block = HTML::indexView)
@@ -110,9 +113,6 @@ fun Application.module() {
                 call.sessions.set(principal)
                 call.respondRedirect("/")
             }
-        }
-        get("/login") {
-            call.respondHtml { Viewer.getHTML(html = this, body = { loginView() }) }
         }
     }
 }
