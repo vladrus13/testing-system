@@ -2,15 +2,18 @@ package ru.testing.html.controller
 
 import EnvironmentConfiguration
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.sessions.*
 import io.ktor.util.pipeline.*
 import kotlinx.css.*
 import kotlinx.html.*
+import ru.testing.html.views.*
 import ru.testing.html.views.chooseFileView
 import ru.testing.html.views.indexView
 import ru.testing.html.views.submissionResultView
@@ -33,24 +36,81 @@ suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
  *
  */
 fun Application.module(configuration: EnvironmentConfiguration) = with(configuration) {
+    install(Sessions) {
+        cookie<UserIdPrincipal>("user_session") {
+            // Configure session authentication
+            cookie.path = "/"
+            cookie.maxAgeInSeconds = 60 * 60  // 1 hour
+        }
+    }
+
+    install(Authentication) {
+        session<UserIdPrincipal>("auth_session") {
+            validate { session ->
+                session  // TODO: maybe we need to store user id somehow?
+            }
+            challenge {
+                call.respondRedirect("/login")
+            }
+        }
+
+        form("auth_form") {
+            userParamName = "username"
+            passwordParamName = "password"
+            validate { credentials ->
+                if (credentials.name == "admin" && credentials.password == "12345") {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
+                }
+            }
+            challenge {
+                call.respondHtml {
+                    Viewer.getHTML(html = this, body = {
+                        loginView()
+                        div {
+                            style = "color:red;"
+                            text("Incorrect username or password")
+                        }
+                    })
+                }
+            }
+        }
+    }
     routing {
         get("/styles.css") {
             call.respondCss { testingSystemCss() }
         }
-        get("/") {
-            call.respondHtml(block = HTML::indexView)
+        get("/logout") {
+            call.sessions.clear<UserIdPrincipal>()
+            call.respondRedirect("/login")
         }
-        get("/chooseFile") {
-            call.respondHtml { Viewer.getHTML(html = this, body = { chooseFileView(configuration.tasksHolder) }) }
+        get("/login") {
+            call.respondHtml { Viewer.getHTML(html = this, body = { loginView() }) }
         }
-        post("/chooseFile") {
-            receiveTask(configuration)
+        authenticate("auth_session") {
+            get("/") {
+                call.respondHtml(block = HTML::indexView)
+            }
+            get("/chooseFile") {
+                call.respondHtml { Viewer.getHTML(html = this, body = { chooseFileView(configuration.tasksHolder) }) }
+            }
+            post("/chooseFile") {
+                receiveTask(configuration)
+            }
+            get("/submission/{id}") {
+                val id = call.parameters["id"]?.toLongOrNull()
+                    ?: return@get call.respondText("Invalid id: ${call.parameters["id"]}")
+                val result = resultHolder.getVerdict(id)
+                call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
+            }
         }
-        get("/submission/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@get call.respondText("Invalid id: ${call.parameters["id"]}")
-            val result = resultHolder.getVerdict(id)
-            call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
+        authenticate("auth_form") {
+            post("/login") {
+                val principal = call.principal<UserIdPrincipal>()
+                call.sessions.set(principal)
+                call.respondRedirect("/")
+            }
         }
     }
 }
