@@ -12,6 +12,10 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.exposed:exposed-core:0.36.2")
+    implementation("org.jetbrains.exposed:exposed-dao:0.36.2")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.2")
+    implementation("org.postgresql:postgresql:42.2.0")
     implementation(project(":tasks"))
     implementation(project(":testlib"))
     implementation(project(":configuration"))

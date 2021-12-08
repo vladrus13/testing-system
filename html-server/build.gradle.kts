@@ -16,6 +16,7 @@ dependencies {
     implementation("org.jetbrains.kotlin-wrappers:kotlin-css:1.0.0-pre.251-kotlin-1.5.31")
     implementation("io.ktor:ktor-server-sessions:1.6.4")
     implementation("io.ktor:ktor-auth:1.6.4")
+    implementation("org.mindrot:jbcrypt:0.4")
     implementation(project(":polygon"))
     implementation(project(":testlib"))
     implementation(project(":tasks"))

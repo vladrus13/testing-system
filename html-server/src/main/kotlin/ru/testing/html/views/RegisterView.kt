@@ -2,10 +2,10 @@ package ru.testing.html.views
 
 import kotlinx.html.*
 
-internal fun BODY.loginView() {
-    text("Log in to Testing System")
+internal fun BODY.registerView() {
+    text("Register")
     form(
-        action = "/login",
+        action = "/register",
         encType = FormEncType.applicationXWwwFormUrlEncoded,
         method = FormMethod.post
     ) {
@@ -18,10 +18,11 @@ internal fun BODY.loginView() {
             passwordInput(name = "password")
         }
         p {
-            submitInput { value = "Login" }
+            +"Confirm password:"
+            passwordInput(name = "confPassword")
         }
-        a("/register") {
-            +"or register"
+        p {
+            submitInput { value = "Register" }
         }
     }
 }

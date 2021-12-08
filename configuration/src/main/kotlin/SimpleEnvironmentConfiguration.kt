@@ -1,6 +1,4 @@
-import interfaces.AbstractExecutors
-import interfaces.AbstractResultHolder
-import interfaces.AbstractTestingQueue
+import interfaces.*
 import ru.testing.testlib.task.Task
 
 class SimpleEnvironmentConfiguration(
@@ -8,10 +6,13 @@ class SimpleEnvironmentConfiguration(
     override val testingQueue: AbstractTestingQueue,
     override val executors: AbstractExecutors,
     override val resultHolder: AbstractResultHolder,
+    override val userHolder: AbstractUserHolder,
+    override val databaseInitializer: AbstractDatabaseInitializer,
     startExecutors: Boolean = true,
 ) : EnvironmentConfiguration {
 
     init {
+        databaseInitializer.createSchema()
         if (startExecutors) {
             executors.run(this)
         }

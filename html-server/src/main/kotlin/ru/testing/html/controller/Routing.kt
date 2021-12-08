@@ -13,6 +13,7 @@ import io.ktor.sessions.*
 import io.ktor.util.pipeline.*
 import kotlinx.css.*
 import kotlinx.html.*
+import org.mindrot.jbcrypt.BCrypt
 import ru.testing.html.views.*
 import ru.testing.html.views.chooseFileView
 import ru.testing.html.views.indexView
@@ -53,12 +54,11 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
                 call.respondRedirect("/login")
             }
         }
-
         form("auth_form") {
             userParamName = "username"
             passwordParamName = "password"
             validate { credentials ->
-                if (credentials.name == "admin" && credentials.password == "12345") {
+                if (validateUserCredentials(configuration, credentials)) {
                     UserIdPrincipal(credentials.name)
                 } else {
                     null
@@ -88,6 +88,12 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
         get("/login") {
             call.respondHtml { Viewer.getHTML(html = this, body = { loginView() }) }
         }
+        get("/register") {
+            call.respondHtml { Viewer.getHTML(html = this, body = { registerView() }) }
+        }
+        post("/register") {
+            handleUserRegister(configuration)
+        }
         authenticate("auth_session") {
             get("/") {
                 call.respondHtml(block = HTML::indexView)
@@ -115,45 +121,65 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
     }
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configuration: EnvironmentConfiguration) = with(configuration) {
-    try {
-        val multipart = call.receiveMultipart()
-        var title = "Source"
-        val (source, task, language) = run {
-            var source: String? = null
-            var task: Task? = null
-            var language: ProgrammingLanguage? = null
-            multipart.forEachPart { part ->
-                if (part is PartData.FormItem) {
-                    if (part.name == "chooseLanguage") {
-                        language = when (part.value) {
-                            "cpp" -> Cpp
-                            "java" -> Java
-                            else -> throw IllegalArgumentException("Unknown language: ${part.value}")
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleUserRegister(configuration: EnvironmentConfiguration) =
+    with(configuration) post@{
+        val params = call.receiveParameters()
+        val username = params["username"] ?: return@post call.respondText("Missing username")
+        val password = params["password"] ?: return@post call.respondText("Missing password")
+        val confirmation = params["confPassword"] ?: return@post call.respondText("Missing password confirmation")
+        if (password.length < 5 || password.length > 40) return@post call.respondText("Password must be from 5 to 40 symbols")
+        if (username.length < 3 || username.length > 25) return@post call.respondText("Username must be from 3 to 25 symbols")
+        if (password != confirmation) return@post call.respondText("Password and confirmation does not match")
+        configuration.userHolder.createUser(username, BCrypt.hashpw(password, BCrypt.gensalt(8)))
+        call.respondRedirect("/login")
+    }
+
+private fun validateUserCredentials(configuration: EnvironmentConfiguration, credentials: UserPasswordCredential) : Boolean {
+    val user = configuration.userHolder.findUserByName(credentials.name) ?: return false
+    if (!BCrypt.checkpw(credentials.password, user.passwordHash)) return false
+    return true
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configuration: EnvironmentConfiguration) =
+    with(configuration) {
+        try {
+            val multipart = call.receiveMultipart()
+            var title = "Source"
+            val (source, task, language) = run {
+                var source: String? = null
+                var task: Task? = null
+                var language: ProgrammingLanguage? = null
+                multipart.forEachPart { part ->
+                    if (part is PartData.FormItem) {
+                        if (part.name == "chooseLanguage") {
+                            language = when (part.value) {
+                                "cpp" -> Cpp
+                                "java" -> Java
+                                else -> throw IllegalArgumentException("Unknown language: ${part.value}")
+                            }
+                        }
+                        if (part.name == "chooseTask") {
+                            task = configuration.tasksHolder[part.value.toLongOrNull()
+                                ?: throw IllegalArgumentException("Unknown task id: ${part.value}")]
                         }
                     }
-                    if (part.name == "chooseTask") {
-                        task = configuration.tasksHolder[part.value.toLongOrNull()
-                            ?: throw IllegalArgumentException("Unknown task id: ${part.value}")]
+                    if (part is PartData.FileItem) {
+                        part.streamProvider().use { stream ->
+                            title = part.originalFileName ?: throw IllegalArgumentException("File name not provided")
+                            source = stream.bufferedReader().use { it.readText() }
+                        }
                     }
+                    part.dispose()
                 }
-                if (part is PartData.FileItem) {
-                    part.streamProvider().use { stream ->
-                        title = part.originalFileName ?: throw IllegalArgumentException("File name not provided")
-                        source = stream.bufferedReader().use { it.readText() }
-                    }
-                }
-                part.dispose()
+                Triple(source, task, language)
             }
-            Triple(source, task, language)
+            require(task != null) { "Task is not specified" }
+            require(source != null) { "Source is not specified" }
+            require(language != null) { "Language is not specified" }
+            val submission = makeSubmission(configuration, title, source, fileType = language, task)
+            configuration.testingQueue.add(submission)
+            call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
+        } catch (e: IllegalArgumentException) {
+            call.respondText(e.message ?: "Bad submission")
         }
-        require(task != null) { "Task is not specified" }
-        require(source != null) { "Source is not specified" }
-        require(language != null) { "Language is not specified" }
-        val submission = makeSubmission(configuration, title, source, fileType = language, task)
-        configuration.testingQueue.add(submission)
-        call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
-    } catch (e: IllegalArgumentException) {
-        call.respondText(e.message ?: "Bad submission")
     }
-}
