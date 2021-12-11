@@ -4,6 +4,8 @@ package ru.testing.testlib.task
  * One test from the task
  *
  * @property input input we give to participant solution
+ * @property juryAnswer jury answer to this input
+ * @property checker checker, if exists. If not exists, must be overridden function check
  */
 abstract class TextTest(
     private val input: String,
@@ -24,7 +26,7 @@ abstract class TextTest(
 
     override fun verdict(participantAnswer: String): TestVerdict {
         if (checker != null) {
-            return checker.check(participantAnswer, juryAnswer)
+            return checker.check(input, participantAnswer, juryAnswer)
         }
         return check(participantAnswer)
     }

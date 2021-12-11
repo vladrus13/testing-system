@@ -1,5 +1,9 @@
 package ru.testing.testlib.task
 
+/**
+ * Test generator for tasks
+ *
+ */
 interface Generator {
     /**
      * Get test for task. MUST give equals tests for equals lists

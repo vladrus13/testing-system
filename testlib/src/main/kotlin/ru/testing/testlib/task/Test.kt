@@ -1,7 +1,15 @@
 package ru.testing.testlib.task
 
+/**
+ * One test to testing system
+ *
+ */
 interface Test {
-
+    /**
+     * Get input from test
+     *
+     * @return input text
+     */
     fun getInput(): String
 
     /**

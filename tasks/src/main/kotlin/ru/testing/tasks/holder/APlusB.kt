@@ -20,8 +20,12 @@ class APlusBTextTest(private val a: Int, private val b: Int) : TextTest("$a $b\n
     }
 }
 
+/**
+ * Checker of absolute answers equals
+ *
+ */
 class AbsoluteEqualsChecker : Checker {
-    override fun check(participantAnswer: String, juryAnswer: String): TestVerdict {
+    override fun check(input: String, participantAnswer: String, juryAnswer: String): TestVerdict {
         return if (participantAnswer.trim() == juryAnswer) {
             TestVerdict.OK
         } else {
@@ -31,9 +35,19 @@ class AbsoluteEqualsChecker : Checker {
 
 }
 
+/**
+ * Test to task A + B with checker
+ *
+ * @param a
+ * @param b
+ */
 class APlusBTest(a: Int, b: Int) :
     TextTest("$a $b", (a + b).toString(), AbsoluteEqualsChecker())
 
+/**
+ * Generator implementation to task A + B
+ *
+ */
 class APlusBGenerator : Generator {
     override fun generate(input: List<Int>): TextTest {
         val from = input[0]

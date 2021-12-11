@@ -17,14 +17,14 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core:1.6.4")
-    implementation("io.ktor:ktor-server-netty:1.6.4")
-    implementation("ch.qos.logback:logback-classic:1.2.6")
+    implementation("io.ktor:ktor-server-core:1.6.6")
+    implementation("io.ktor:ktor-server-netty:1.6.6")
+    implementation("ch.qos.logback:logback-classic:1.2.7")
     implementation(project("html-server"))
     implementation(project("polygon"))
     implementation(project("configuration"))
     implementation(project("tasks"))
     implementation(project("testlib"))
     implementation(project("model"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 }
