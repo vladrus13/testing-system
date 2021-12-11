@@ -1,15 +1,15 @@
 package ru.testing
 
 import SimpleEnvironmentConfiguration
-import ru.testing.polygon.submission.ProgrammingLanguage
 import kotlinx.coroutines.delay
-import ru.testing.polygon.database.DatabaseInitializer
-import ru.testing.polygon.database.ResultHolder
-import ru.testing.polygon.database.UserHolder
+import ru.testing.databese.DatabaseInitializer
+import ru.testing.databese.ResultHolder
+import ru.testing.databese.UserHolder
 import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.server.Executors
 import ru.testing.polygon.submission.Cpp
 import ru.testing.polygon.submission.Java
+import ru.testing.polygon.submission.ProgrammingLanguage
 import ru.testing.polygon.submission.makeSubmission
 import ru.testing.tasks.TasksHolder
 import ru.testing.testlib.limits.Limits
@@ -17,7 +17,6 @@ import ru.testing.testlib.task.SubmissionVerdict
 import ru.testing.testlib.task.SubmissionVerdict.*
 import ru.testing.testlib.task.TestVerdict
 import java.time.Instant
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime

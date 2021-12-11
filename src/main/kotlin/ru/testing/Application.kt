@@ -3,10 +3,10 @@ package ru.testing
 import SimpleEnvironmentConfiguration
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import ru.testing.databese.DatabaseInitializer
+import ru.testing.databese.ResultHolder
+import ru.testing.databese.UserHolder
 import ru.testing.html.controller.module
-import ru.testing.polygon.database.DatabaseInitializer
-import ru.testing.polygon.database.ResultHolder
-import ru.testing.polygon.database.UserHolder
 import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.server.Executors
 import ru.testing.tasks.TasksHolder

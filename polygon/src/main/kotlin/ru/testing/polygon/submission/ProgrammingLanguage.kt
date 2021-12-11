@@ -1,7 +1,7 @@
 package ru.testing.polygon.submission
 
 import EnvironmentConfiguration
-import interfaces.SubmissionProcessFile
+import ru.testing.polygon.queue.SubmissionProcessFile
 import ru.testing.testlib.task.CompileRunTask
 import ru.testing.testlib.task.SubmissionVerdict
 import ru.testing.testlib.task.SubmissionVerdict.RunningVerdict

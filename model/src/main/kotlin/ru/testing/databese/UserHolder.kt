@@ -1,14 +1,12 @@
-package ru.testing.polygon.database
+package ru.testing.databese
 
 import interfaces.AbstractUserHolder
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import ru.testing.polygon.database.definition.Users
+import ru.testing.databese.definition.Users
 import ru.testing.testlib.domain.User
-import java.lang.RuntimeException
 
 class UserHolder : AbstractUserHolder {
     override fun findUserById(id: Int): User? {

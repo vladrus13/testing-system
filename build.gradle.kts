@@ -25,5 +25,6 @@ dependencies {
     implementation(project("configuration"))
     implementation(project("tasks"))
     implementation(project("testlib"))
+    implementation(project("model"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
 }
