@@ -2,8 +2,7 @@ package ru.testing.polygon.submission
 
 import EnvironmentConfiguration
 import interfaces.SubmissionFile
-import interfaces.SubmissionProcessFile
-import ru.testing.polygon.database.ResultHolder
+import ru.testing.polygon.queue.SubmissionProcessFile
 import ru.testing.testlib.task.Task
 
 /**

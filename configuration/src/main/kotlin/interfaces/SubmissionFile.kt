@@ -15,6 +15,6 @@ class SubmissionFile(
     val id: Long,
     val title: String,
     val source: String,
-    val processFile: SubmissionProcessFile,
+    val processFile: AbstractSubmissionProcessFile,
     val task: Task
 )
