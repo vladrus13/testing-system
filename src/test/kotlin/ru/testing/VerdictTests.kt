@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
-import ru.testing.TestUtils.TestTask.*
+import ru.testing.TestUtils.TestTask.`A + B + C`
+import ru.testing.TestUtils.TestTask.`A + B`
 import ru.testing.TestUtils.runTask
 import ru.testing.VerdictTests.CorrectPrograms.correctCpp
 import ru.testing.VerdictTests.CorrectPrograms.correctJava
@@ -58,13 +59,13 @@ class VerdictTests {
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = Cpp, source = correctCpp(2)).allOk(4)
+            runTask(task = `A + B`, language = Cpp, source = correctCpp(2)).allOk(12)
             runTask(task = `A + B + C`, language = Cpp, source = correctCpp(3)).allOk(6)
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = Java, source = correctJava(2)).allOk(4)
+            runTask(task = `A + B`, language = Java, source = correctJava(2)).allOk(12)
             runTask(task = `A + B + C`, language = Java, source = correctJava(3)).allOk(6)
         }
     }
