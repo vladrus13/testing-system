@@ -1,4 +1,4 @@
-package ru.testing.polygon.database
+package ru.testing.databese
 
 import interfaces.AbstractResultHolder
 import ru.testing.testlib.task.SubmissionVerdict

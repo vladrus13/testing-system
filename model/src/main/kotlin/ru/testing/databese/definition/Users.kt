@@ -1,4 +1,4 @@
-package ru.testing.polygon.database.definition
+package ru.testing.databese.definition
 
 import org.jetbrains.exposed.sql.Table
 
