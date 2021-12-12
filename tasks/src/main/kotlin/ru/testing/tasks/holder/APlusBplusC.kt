@@ -2,8 +2,8 @@ package ru.testing.tasks.holder
 
 import ru.testing.testlib.limits.Limits
 import ru.testing.testlib.task.CompileRunTask
-import ru.testing.testlib.task.Test
 import ru.testing.testlib.task.TestVerdict
+import ru.testing.testlib.task.TextTest
 
 /**
  * Test to A+B task
@@ -11,7 +11,8 @@ import ru.testing.testlib.task.TestVerdict
  * @property a a
  * @property b b
  */
-class APlusBTestPlusCTest(private val a: Int, private val b: Int, private val c: Int) : Test("$a $b $c\n") {
+class APlusBTestPlusCTextTest(private val a: Int, private val b: Int, private val c: Int) :
+    TextTest("$a $b $c\n", (a + b + c).toString()) {
     override fun verdict(participantAnswer: String): TestVerdict {
         return if (participantAnswer.trim().toInt() == a + b + c) {
             TestVerdict.OK
@@ -27,12 +28,12 @@ class APlusBTestPlusCTest(private val a: Int, private val b: Int, private val c:
  */
 class APlusBPlusC : CompileRunTask(
     listOf(
-        APlusBTestPlusCTest(0, 0, 0),
-        APlusBTestPlusCTest(1, 0, 0),
-        APlusBTestPlusCTest(0, 1, 1),
-        APlusBTestPlusCTest(2, 2, 4),
-        APlusBTestPlusCTest(20, 20, 40),
-        APlusBTestPlusCTest(200, 200, 400),
+        APlusBTestPlusCTextTest(0, 0, 0),
+        APlusBTestPlusCTextTest(1, 0, 0),
+        APlusBTestPlusCTextTest(0, 1, 1),
+        APlusBTestPlusCTextTest(2, 2, 4),
+        APlusBTestPlusCTextTest(20, 20, 40),
+        APlusBTestPlusCTextTest(200, 200, 400),
     ),
     Limits.COMPILATION_LIMITS,
     Limits.OLYMPIC_LIMITS

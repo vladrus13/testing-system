@@ -48,12 +48,12 @@ sealed class ProgrammingLanguage : SubmissionProcessFile() {
                 if (results.code != 0) {
                     resultHolder.sendVerdict(submissionId, SubmissionVerdict.CompilationError(results.error))
                 } else {
-                    resultHolder.sendVerdict(submissionId, RunningVerdict(ArrayList(task.tests.indices.map { NL })))
-                    task.tests.forEachIndexed { index, test ->
+                    resultHolder.sendVerdict(submissionId, RunningVerdict(ArrayList(task.textTests.indices.map { NL })))
+                    task.textTests.forEachIndexed { index, test ->
                         val execution = execute(
                             command = getRunningCommand(name),
                             directory = folder,
-                            input = test.input,
+                            input = test.getInput(),
                             limits = task.run
                         )
                         resultHolder.sendVerdict(

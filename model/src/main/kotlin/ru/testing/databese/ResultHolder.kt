@@ -36,7 +36,7 @@ class ResultHolder : AbstractResultHolder {
      */
     override fun addTask(task: Task): Long {
         val id = futureId.incrementAndGet()
-        holder[id] = SubmissionVerdict.NotLaunchedVerdict(task.tests.size)
+        holder[id] = SubmissionVerdict.NotLaunchedVerdict(task.textTests.size)
         return id
     }
 

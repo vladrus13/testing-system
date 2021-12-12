@@ -1,10 +1,8 @@
 package ru.testing.polygon.server
 
 import EnvironmentConfiguration
-import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.utils.TestingConfiguration
 import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.nio.file.FileVisitResult
 import java.nio.file.FileVisitor
 import java.nio.file.Files
@@ -12,10 +10,10 @@ import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
 
 /**
- * Mono thread executor. Takes tasks and executes it
+ * Mono thread executor. Take tasks and executes it
  *
  */
-class MonoExecutor() {
+class MonoExecutor {
 
     private var hasExited = false
 
