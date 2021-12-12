@@ -66,6 +66,8 @@ class APlusBGenerator : Generator {
  *
  */
 class APlusB : CompileRunTask(
+    "A + B",
+    "Сложите два числа",
     listOf(
         APlusBTextTest(0, 0),
         APlusBTextTest(1, 0),

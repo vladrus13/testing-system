@@ -27,6 +27,8 @@ class APlusBTestPlusCTextTest(private val a: Int, private val b: Int, private va
  *
  */
 class APlusBPlusC : CompileRunTask(
+    "A + B + C",
+    "Сложите три числа",
     listOf(
         APlusBTestPlusCTextTest(0, 0, 0),
         APlusBTestPlusCTextTest(1, 0, 0),
