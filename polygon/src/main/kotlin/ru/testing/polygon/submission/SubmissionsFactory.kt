@@ -1,8 +1,8 @@
 package ru.testing.polygon.submission
 
 import EnvironmentConfiguration
+import interfaces.AbstractTypeOfLaunching
 import interfaces.SubmissionFile
-import ru.testing.polygon.queue.SubmissionProcessFile
 import ru.testing.testlib.task.Task
 
 /**
@@ -18,7 +18,7 @@ fun makeSubmission(
     configuration: EnvironmentConfiguration,
     title: String,
     source: String,
-    fileType: SubmissionProcessFile,
+    fileType: AbstractTypeOfLaunching,
     task: Task
 ): SubmissionFile = with(configuration) {
     val id = resultHolder.addTask(task)

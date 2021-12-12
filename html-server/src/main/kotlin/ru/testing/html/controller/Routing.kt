@@ -1,6 +1,7 @@
 package ru.testing.html.controller
 
 import EnvironmentConfiguration
+import interfaces.AbstractTypeOfLaunching
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.html.*
@@ -11,16 +12,14 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.ktor.util.pipeline.*
-import kotlinx.css.*
-import kotlinx.html.*
+import kotlinx.css.CssBuilder
+import kotlinx.html.HTML
+import kotlinx.html.div
+import kotlinx.html.style
 import org.mindrot.jbcrypt.BCrypt
 import ru.testing.html.views.*
-import ru.testing.html.views.chooseFileView
-import ru.testing.html.views.indexView
-import ru.testing.html.views.submissionResultView
-import ru.testing.html.views.testingSystemCss
 import ru.testing.html.views.utils.Viewer
-import ru.testing.polygon.submission.*
+import ru.testing.polygon.submission.makeSubmission
 import ru.testing.testlib.task.Task
 
 /**
@@ -94,12 +93,23 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
         post("/register") {
             handleUserRegister(configuration)
         }
+        get("/tasks") {
+            call.respondHtml {
+                Viewer.getHTML(
+                    html = this,
+                    body = { taskView(configuration.tasksHolder) })
+            }
+        }
         authenticate("auth_session") {
             get("/") {
                 call.respondHtml(block = HTML::indexView)
             }
             get("/chooseFile") {
-                call.respondHtml { Viewer.getHTML(html = this, body = { chooseFileView(configuration.tasksHolder) }) }
+                call.respondHtml {
+                    Viewer.getHTML(
+                        html = this,
+                        body = { chooseFileView(configuration.tasksHolder, configuration.typeOfLaunchingHolder) })
+                }
             }
             post("/chooseFile") {
                 receiveTask(configuration)
@@ -134,7 +144,10 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleUserRegister(co
         call.respondRedirect("/login")
     }
 
-private fun validateUserCredentials(configuration: EnvironmentConfiguration, credentials: UserPasswordCredential) : Boolean {
+private fun validateUserCredentials(
+    configuration: EnvironmentConfiguration,
+    credentials: UserPasswordCredential
+): Boolean {
     val user = configuration.userHolder.findUserByName(credentials.name) ?: return false
     if (!BCrypt.checkpw(credentials.password, user.passwordHash)) return false
     return true
@@ -148,15 +161,14 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configura
             val (source, task, language) = run {
                 var source: String? = null
                 var task: Task? = null
-                var language: ProgrammingLanguage? = null
+                var language: AbstractTypeOfLaunching? = null
                 multipart.forEachPart { part ->
                     if (part is PartData.FormItem) {
                         if (part.name == "chooseLanguage") {
-                            language = when (part.value) {
-                                "cpp" -> Cpp
-                                "java" -> Java
-                                else -> throw IllegalArgumentException("Unknown language: ${part.value}")
+                            for (typeOfLaunch in configuration.typeOfLaunchingHolder.getTypesOfLaunch()) {
+                                if (typeOfLaunch.getCodeName() == part.value) language = typeOfLaunch
                             }
+                            language ?: throw IllegalArgumentException("Unknown language: ${part.value}")
                         }
                         if (part.name == "chooseTask") {
                             task = configuration.tasksHolder[part.value.toLongOrNull()

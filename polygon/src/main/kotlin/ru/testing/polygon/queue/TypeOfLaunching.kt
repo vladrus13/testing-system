@@ -1,6 +1,6 @@
 package ru.testing.polygon.queue
 
-import interfaces.AbstractSubmissionProcessFile
+import interfaces.AbstractTypeOfLaunching
 import ru.testing.testlib.limits.Limits
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
  * Submission type. Runs solution we get
  *
  */
-abstract class SubmissionProcessFile : AbstractSubmissionProcessFile {
+abstract class TypeOfLaunching : AbstractTypeOfLaunching {
 
     private fun setInput(path: Path, input: String) {
         path.toFile().printWriter(StandardCharsets.UTF_8).use {
@@ -29,7 +29,7 @@ abstract class SubmissionProcessFile : AbstractSubmissionProcessFile {
         directory: Path,
         input: String?,
         limits: Limits
-    ): AbstractSubmissionProcessFile.OutputProcessFile? {
+    ): AbstractTypeOfLaunching.OutputProcessFile? {
         val processBuilder = ProcessBuilder(command)
         processBuilder.directory(directory.toFile())
         if (input != null) {
@@ -61,7 +61,7 @@ abstract class SubmissionProcessFile : AbstractSubmissionProcessFile {
                     it1.readText()
                 }
             }
-            return AbstractSubmissionProcessFile.OutputProcessFile(
+            return AbstractTypeOfLaunching.OutputProcessFile(
                 error = error,
                 code = exitValue
             )
@@ -72,7 +72,7 @@ abstract class SubmissionProcessFile : AbstractSubmissionProcessFile {
                 }
             }
             val output = getOutput(outputFile)
-            return AbstractSubmissionProcessFile.OutputProcessFile(
+            return AbstractTypeOfLaunching.OutputProcessFile(
                 output = output,
                 error = error,
                 code = exitValue

@@ -8,4 +8,5 @@ interface EnvironmentConfiguration {
     val resultHolder: AbstractResultHolder
     val userHolder: AbstractUserHolder
     val databaseInitializer: AbstractDatabaseInitializer
+    val typeOfLaunchingHolder: AbstractTypeOfLaunchingHolder
 }

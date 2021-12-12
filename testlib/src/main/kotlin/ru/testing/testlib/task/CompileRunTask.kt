@@ -10,4 +10,5 @@ import ru.testing.testlib.limits.Limits
  *
  * @param tests tests of task
  */
-open class CompileRunTask(tests: List<Test>, val compile: Limits, val run: Limits) : Task(tests)
+open class CompileRunTask(title: String, task: String, tests: List<Test>, val compile: Limits, val run: Limits) :
+    Task(title, task, tests)

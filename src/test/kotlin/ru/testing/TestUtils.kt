@@ -5,11 +5,12 @@ import kotlinx.coroutines.delay
 import ru.testing.databese.DatabaseInitializer
 import ru.testing.databese.ResultHolder
 import ru.testing.databese.UserHolder
+import ru.testing.polygon.database.TypeOfLaunchingHolder
 import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.server.Executors
-import ru.testing.polygon.submission.Cpp
-import ru.testing.polygon.submission.Java
-import ru.testing.polygon.submission.ProgrammingLanguage
+import ru.testing.polygon.submission.OlympiadCpp
+import ru.testing.polygon.submission.OlympiadJava
+import ru.testing.polygon.submission.OlympiadProgrammingLanguage
 import ru.testing.polygon.submission.makeSubmission
 import ru.testing.tasks.TasksHolder
 import ru.testing.testlib.limits.Limits
@@ -28,13 +29,21 @@ object TestUtils {
 
     suspend fun runTask(
         task: TestTask,
-        language: ProgrammingLanguage,
+        language: OlympiadProgrammingLanguage,
         source: String,
     ): SubmissionVerdict {
-        val configuration = SimpleEnvironmentConfiguration(TasksHolder(), TestingQueue(), Executors(1), ResultHolder(), UserHolder(), DatabaseInitializer())
+        val configuration = SimpleEnvironmentConfiguration(
+            TasksHolder(),
+            TestingQueue(),
+            Executors(1),
+            ResultHolder(),
+            UserHolder(),
+            DatabaseInitializer(),
+            TypeOfLaunchingHolder()
+        )
         val extension = when (language) {
-            Cpp -> "cpp"
-            Java -> "java"
+            OlympiadCpp -> "cpp"
+            OlympiadJava -> "java"
         }
         val submissionFile = makeSubmission(
             configuration,
