@@ -1,7 +1,7 @@
 package ru.testing.polygon.submission
 
 import EnvironmentConfiguration
-import ru.testing.polygon.queue.SubmissionProcessFile
+import ru.testing.polygon.queue.TypeOfLaunching
 import ru.testing.testlib.task.CompileRunTask
 import ru.testing.testlib.task.SubmissionVerdict
 import ru.testing.testlib.task.SubmissionVerdict.RunningVerdict
@@ -14,7 +14,7 @@ import kotlin.io.path.nameWithoutExtension
  * Submission to compile and run
  *
  */
-sealed class ProgrammingLanguage : SubmissionProcessFile() {
+sealed class OlympiadProgrammingLanguage : TypeOfLaunching() {
 
     /**
      * Gets compiling command

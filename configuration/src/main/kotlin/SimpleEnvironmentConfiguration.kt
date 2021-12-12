@@ -8,6 +8,7 @@ class SimpleEnvironmentConfiguration(
     override val resultHolder: AbstractResultHolder,
     override val userHolder: AbstractUserHolder,
     override val databaseInitializer: AbstractDatabaseInitializer,
+    override val typeOfLaunchingHolder: AbstractTypeOfLaunchingHolder,
     startExecutors: Boolean = true,
 ) : EnvironmentConfiguration {
 

@@ -9,7 +9,21 @@ import java.nio.file.Path
  * Submission of participant. We must test it
  *
  */
-interface AbstractSubmissionProcessFile {
+interface AbstractTypeOfLaunching {
+
+    /**
+     * Get official name of programming language
+     *
+     * @return name
+     */
+    fun getName(): String
+
+    /**
+     * Get code name of programming language
+     *
+     * @return code name
+     */
+    fun getCodeName(): String
 
     /**
      * Output of execution

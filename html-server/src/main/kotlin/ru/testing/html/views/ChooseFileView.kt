@@ -1,9 +1,10 @@
 package ru.testing.html.views
 
+import interfaces.AbstractTypeOfLaunchingHolder
 import kotlinx.html.*
 import ru.testing.testlib.task.Task
 
-internal fun BODY.chooseFileView(tasksHolder: Map<Long, Task>) {
+internal fun BODY.chooseFileView(tasksHolder: Map<Long, Task>, typeOfLaunchingHolder: AbstractTypeOfLaunchingHolder) {
     form(method = FormMethod.post, encType = FormEncType.multipartFormData) {
         acceptCharset = "utf-8"
         select {
@@ -17,13 +18,11 @@ internal fun BODY.chooseFileView(tasksHolder: Map<Long, Task>) {
         }
         select {
             this.name = "chooseLanguage"
-            option {
-                value = "java"
-                text("Java")
-            }
-            option {
-                value = "cpp"
-                text("C++")
+            for (typeOfLaunch in typeOfLaunchingHolder.getTypesOfLaunch()) {
+                option {
+                    value = typeOfLaunch.getCodeName()
+                    text(typeOfLaunch.getName())
+                }
             }
         }
         br()

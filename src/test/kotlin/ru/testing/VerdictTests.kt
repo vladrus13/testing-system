@@ -11,8 +11,8 @@ import ru.testing.TestUtils.TestTask.`A + B`
 import ru.testing.TestUtils.runTask
 import ru.testing.VerdictTests.CorrectPrograms.correctCpp
 import ru.testing.VerdictTests.CorrectPrograms.correctJava
-import ru.testing.polygon.submission.Cpp
-import ru.testing.polygon.submission.Java
+import ru.testing.polygon.submission.OlympiadCpp
+import ru.testing.polygon.submission.OlympiadJava
 import ru.testing.testlib.task.SubmissionVerdict
 import ru.testing.testlib.task.TestVerdict
 import kotlin.time.ExperimentalTime
@@ -59,14 +59,14 @@ class VerdictTests {
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = Cpp, source = correctCpp(2)).allOk(12)
-            runTask(task = `A + B + C`, language = Cpp, source = correctCpp(3)).allOk(6)
+            runTask(task = `A + B`, language = OlympiadCpp, source = correctCpp(2)).allOk(12)
+            runTask(task = `A + B + C`, language = OlympiadCpp, source = correctCpp(3)).allOk(6)
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = Java, source = correctJava(2)).allOk(12)
-            runTask(task = `A + B + C`, language = Java, source = correctJava(3)).allOk(6)
+            runTask(task = `A + B`, language = OlympiadJava, source = correctJava(2)).allOk(12)
+            runTask(task = `A + B + C`, language = OlympiadJava, source = correctJava(3)).allOk(6)
         }
     }
 
@@ -75,7 +75,7 @@ class VerdictTests {
         @Test
         fun cpp() = runBlocking {
             runTask(
-                task = `A + B`, language = Cpp,
+                task = `A + B`, language = OlympiadCpp,
                 source = correctCpp(2).replace("iostream", "lalala")
             ).assertCorrectness()
         }
@@ -83,7 +83,7 @@ class VerdictTests {
         @Test
         fun java() = runBlocking {
             runTask(
-                task = `A + B`, language = Java,
+                task = `A + B`, language = OlympiadJava,
                 source = correctJava(2).replace("class", "lalala")
             ).assertCorrectness()
         }
@@ -99,12 +99,12 @@ class VerdictTests {
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = Cpp, source = makeTL(correctCpp(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadCpp, source = makeTL(correctCpp(2))).assertCorrectness()
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = Java, source = makeTL(correctJava(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadJava, source = makeTL(correctJava(2))).assertCorrectness()
         }
 
         private fun SubmissionVerdict.assertCorrectness() {
@@ -120,12 +120,12 @@ class VerdictTests {
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = Cpp, source = makeRE(correctCpp(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadCpp, source = makeRE(correctCpp(2))).assertCorrectness()
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = Java, source = makeRE(correctJava(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadJava, source = makeRE(correctJava(2))).assertCorrectness()
         }
 
         private fun SubmissionVerdict.assertCorrectness() {
@@ -141,12 +141,12 @@ class VerdictTests {
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = Cpp, source = makeWA(correctCpp(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadCpp, source = makeWA(correctCpp(2))).assertCorrectness()
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = Java, source = makeWA(correctJava(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadJava, source = makeWA(correctJava(2))).assertCorrectness()
         }
 
         private fun SubmissionVerdict.assertCorrectness() {
