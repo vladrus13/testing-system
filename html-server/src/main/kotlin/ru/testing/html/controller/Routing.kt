@@ -93,6 +93,13 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
         post("/register") {
             handleUserRegister(configuration)
         }
+        get("/tasks") {
+            call.respondHtml {
+                Viewer.getHTML(
+                    html = this,
+                    body = { taskView(configuration.tasksHolder) })
+            }
+        }
         authenticate("auth_session") {
             get("/") {
                 call.respondHtml(block = HTML::indexView)
@@ -137,7 +144,10 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleUserRegister(co
         call.respondRedirect("/login")
     }
 
-private fun validateUserCredentials(configuration: EnvironmentConfiguration, credentials: UserPasswordCredential) : Boolean {
+private fun validateUserCredentials(
+    configuration: EnvironmentConfiguration,
+    credentials: UserPasswordCredential
+): Boolean {
     val user = configuration.userHolder.findUserByName(credentials.name) ?: return false
     if (!BCrypt.checkpw(credentials.password, user.passwordHash)) return false
     return true
