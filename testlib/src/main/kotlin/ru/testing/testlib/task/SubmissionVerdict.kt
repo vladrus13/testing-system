@@ -27,8 +27,6 @@ sealed class SubmissionVerdict {
 
     /**
      * Not launched verdict
-     *
-     * @property testsCount count of tests
      */
-    data class NotLaunchedVerdict(private val testsCount: Int) : SubmissionVerdict()
+    object NotLaunchedVerdict : SubmissionVerdict()
 }
