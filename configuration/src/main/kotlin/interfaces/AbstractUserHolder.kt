@@ -8,7 +8,7 @@ interface AbstractUserHolder {
      * @param id userid
      * @return user if it exists
      */
-    fun findUserById(id: Int): User?
+    fun findUserById(id: Long): User?
 
     /**
      * Receives user by its username

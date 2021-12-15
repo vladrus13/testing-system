@@ -6,6 +6,7 @@ import ru.testing.testlib.task.CompileRunTask
 import ru.testing.testlib.task.SubmissionVerdict
 import ru.testing.testlib.task.SubmissionVerdict.RunningVerdict
 import ru.testing.testlib.task.Task
+import ru.testing.testlib.task.TestVerdict
 import ru.testing.testlib.task.TestVerdict.*
 import java.nio.file.Path
 import kotlin.io.path.nameWithoutExtension
@@ -48,7 +49,7 @@ sealed class OlympiadProgrammingLanguage : TypeOfLaunching() {
                 if (results.code != 0) {
                     resultHolder.sendVerdict(submissionId, SubmissionVerdict.CompilationError(results.error))
                 } else {
-                    resultHolder.sendVerdict(submissionId, RunningVerdict(ArrayList(task.textTests.indices.map { NL })))
+                    resultHolder.sendVerdict(submissionId, RunningVerdict(emptyList()))
                     task.textTests.forEachIndexed { index, test ->
                         val execution = execute(
                             command = getRunningCommand(name),
@@ -56,7 +57,7 @@ sealed class OlympiadProgrammingLanguage : TypeOfLaunching() {
                             input = test.getInput(),
                             limits = task.run
                         )
-                        resultHolder.sendVerdict(
+                        resultHolder.sendTestVerdict(
                             submissionId, index,
                             when {
                                 execution == null -> TL

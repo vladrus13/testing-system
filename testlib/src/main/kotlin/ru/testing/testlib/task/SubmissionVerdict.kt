@@ -1,9 +1,12 @@
 package ru.testing.testlib.task
 
+import kotlinx.serialization.Serializable
+
 /**
  * Verdict of submission
  *
  */
+@Serializable
 sealed class SubmissionVerdict {
 
     /**
@@ -11,11 +14,13 @@ sealed class SubmissionVerdict {
      *
      * @property cause cause of compilation error
      */
+    @Serializable
     data class CompilationError(val cause: String) : SubmissionVerdict()
 
     /**
      * Compilation took too much time verdict
      */
+    @Serializable
     object CompilationTimeLimit: SubmissionVerdict()
 
     /**
@@ -23,10 +28,12 @@ sealed class SubmissionVerdict {
      *
      * @property tests verdicts of running
      */
-    data class RunningVerdict(val tests: ArrayList<TestVerdict>) : SubmissionVerdict()
+    @Serializable
+    data class RunningVerdict(val tests: List<TestVerdict>) : SubmissionVerdict()
 
     /**
      * Not launched verdict
      */
+    @Serializable
     object NotLaunchedVerdict : SubmissionVerdict()
 }

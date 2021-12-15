@@ -20,6 +20,7 @@ import org.mindrot.jbcrypt.BCrypt
 import ru.testing.html.views.*
 import ru.testing.html.views.utils.Viewer
 import ru.testing.polygon.submission.makeSubmission
+import ru.testing.testlib.domain.User
 import ru.testing.testlib.task.Task
 
 /**
@@ -31,13 +32,15 @@ suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
     this.respondText(CssBuilder().apply(builder).toString(), ContentType.Text.CSS)
 }
 
+data class UserPrincipal(val user: User) : Principal
+
 /**
  * Routing function
  *
  */
 fun Application.module(configuration: EnvironmentConfiguration) = with(configuration) {
     install(Sessions) {
-        cookie<UserIdPrincipal>("user_session") {
+        cookie<UserPrincipal>("user_session") {
             // Configure session authentication
             cookie.path = "/"
             cookie.maxAgeInSeconds = 60 * 60  // 1 hour
@@ -45,9 +48,9 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
     }
 
     install(Authentication) {
-        session<UserIdPrincipal>("auth_session") {
+        session<UserPrincipal>("auth_session") {
             validate { session ->
-                session  // TODO: maybe we need to store user id somehow?
+                session
             }
             challenge {
                 call.respondRedirect("/login")
@@ -58,7 +61,9 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
             passwordParamName = "password"
             validate { credentials ->
                 if (validateUserCredentials(configuration, credentials)) {
-                    UserIdPrincipal(credentials.name)
+                    // Should not be null, because we looked up the user in the database, and deletion is not allowed.
+                    // On implementing deletion: Striped lock on id is useful here to prevent race conditions.
+                    UserPrincipal(configuration.userHolder.findUserByName(credentials.name)!!)
                 } else {
                     null
                 }
@@ -100,6 +105,13 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
                     body = { taskView(configuration.tasksHolder) })
             }
         }
+        authenticate("auth_form") {
+            post("/login") {
+                val principal = call.principal<UserPrincipal>()
+                call.sessions.set(principal)
+                call.respondRedirect("/")
+            }
+        }
         authenticate("auth_session") {
             get("/") {
                 call.respondHtml(block = HTML::indexView)
@@ -119,13 +131,6 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
                     ?: return@get call.respondText("Invalid id: ${call.parameters["id"]}")
                 val result = resultHolder.getVerdict(id)
                 call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
-            }
-        }
-        authenticate("auth_form") {
-            post("/login") {
-                val principal = call.principal<UserIdPrincipal>()
-                call.sessions.set(principal)
-                call.respondRedirect("/")
             }
         }
     }
@@ -188,7 +193,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configura
             require(task != null) { "Task is not specified" }
             require(source != null) { "Source is not specified" }
             require(language != null) { "Language is not specified" }
-            val submission = makeSubmission(configuration, title, source, fileType = language, task)
+            val submission = makeSubmission(configuration, title, source, fileType = language, task, call.principal<UserPrincipal>()!!.user.id)
             configuration.testingQueue.add(submission)
             call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
         } catch (e: IllegalArgumentException) {

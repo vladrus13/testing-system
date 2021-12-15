@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization") version "1.5.31"
     idea
 }
 
@@ -12,5 +13,6 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
     implementation("io.ktor:ktor-html-builder:1.6.4")
 }
