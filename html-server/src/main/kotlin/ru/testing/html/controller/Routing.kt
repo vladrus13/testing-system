@@ -133,6 +133,12 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
                 val result = resultHolder.getVerdict(id)
                 call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
             }
+            get("/submissions") {
+                val userId = call.principal<UserPrincipal>()?.user?.id
+                    ?: throw IllegalStateException("Should not happen - submissions page requires authentication")
+                val submissions = configuration.resultHolder.getLastSubmissions(userId, 10)
+                call.respondHtml { Viewer.getHTML(html = this, body = { submissionsView(submissions) }) }
+            }
         }
     }
 }

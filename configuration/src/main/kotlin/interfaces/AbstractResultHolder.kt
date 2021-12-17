@@ -1,5 +1,6 @@
 package interfaces
 
+import ru.testing.testlib.domain.Submission
 import ru.testing.testlib.task.SubmissionVerdict
 import ru.testing.testlib.task.Task
 import ru.testing.testlib.task.TestVerdict
@@ -54,4 +55,11 @@ interface AbstractResultHolder {
      * @param verdict verdict of the test
      */
     fun sendTestVerdict(submissionId: Long, testId: Int, verdict: TestVerdict)
+
+    /**
+     * Receive the latest submissions of user
+     * @param submissionCount how many submission to receive
+     * @return list of submissions
+     */
+    fun getLastSubmissions(userId: Long, submissionCount: Int) : List<Submission>
 }

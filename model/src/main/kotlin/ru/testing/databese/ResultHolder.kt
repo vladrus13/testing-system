@@ -4,11 +4,8 @@ import interfaces.AbstractResultHolder
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import ru.testing.databese.definition.Submissions
 import ru.testing.databese.definition.TestVerdicts
 import ru.testing.testlib.domain.Submission
@@ -101,6 +98,17 @@ class ResultHolder : AbstractResultHolder {
         }
     }
 
+    override fun getLastSubmissions(userId: Long, submissionCount: Int): List<Submission> {
+        val rows = transaction {
+            Submissions.select { Submissions.userId eq userId }
+                .orderBy(Submissions.id to SortOrder.DESC)
+                .limit(submissionCount)
+                .toList()
+                .map { x -> mapToSubmission(x) }
+        }
+        return rows
+    }
+
     private fun mapToTestVerdict(it: ResultRow): TestVerdict {
         return Json.decodeFromString(it[TestVerdicts.serializedStatus])
     }
@@ -120,7 +128,7 @@ class ResultHolder : AbstractResultHolder {
                 TestVerdicts.select {
                     TestVerdicts.submissionId eq submissionId
                 }.forEach {
-                    testList[it[TestVerdicts.testId]] = Json.decodeFromString(it[TestVerdicts.serializedStatus])
+                    testList[it[TestVerdicts.testId]] = mapToTestVerdict(it)
                 }
             }
             return SubmissionVerdict.RunningVerdict(testList)
