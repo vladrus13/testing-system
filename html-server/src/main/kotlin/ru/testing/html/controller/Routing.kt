@@ -22,6 +22,7 @@ import ru.testing.html.views.utils.Viewer
 import ru.testing.polygon.submission.makeSubmission
 import ru.testing.testlib.domain.User
 import ru.testing.testlib.task.Task
+import java.lang.IllegalStateException
 
 /**
  * Respond of css
@@ -193,7 +194,9 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configura
             require(task != null) { "Task is not specified" }
             require(source != null) { "Source is not specified" }
             require(language != null) { "Language is not specified" }
-            val submission = makeSubmission(configuration, title, source, fileType = language, task, call.principal<UserPrincipal>()!!.user.id)
+            val principal = call.principal<UserPrincipal>()
+                ?: throw IllegalStateException("Should never happen - submission require authentication")
+            val submission = makeSubmission(configuration, title, source, fileType = language, task, principal.user.id)
             configuration.testingQueue.add(submission)
             call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
         } catch (e: IllegalArgumentException) {
