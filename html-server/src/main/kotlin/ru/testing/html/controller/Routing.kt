@@ -87,7 +87,7 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
             call.respondCss { testingSystemCss() }
         }
         get("/logout") {
-            call.sessions.clear<UserIdPrincipal>()
+            call.sessions.clear<UserPrincipal>()
             call.respondRedirect("/login")
         }
         get("/login") {
