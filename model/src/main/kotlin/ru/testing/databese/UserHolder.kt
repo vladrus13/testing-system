@@ -23,7 +23,7 @@ class UserHolder : AbstractUserHolder {
 
     override fun createUser(name: String, passwordHash: String) {
         if (findUserByName(name) != null) {
-            throw RuntimeException("This username is occupied")  // TODO: handle it
+            throw IllegalArgumentException("This username is occupied")
         }
         return transaction {
             Users.insert {

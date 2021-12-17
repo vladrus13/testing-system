@@ -146,7 +146,11 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleUserRegister(co
         if (password.length < 5 || password.length > 40) return@post call.respondText("Password must be from 5 to 40 symbols")
         if (username.length < 3 || username.length > 25) return@post call.respondText("Username must be from 3 to 25 symbols")
         if (password != confirmation) return@post call.respondText("Password and confirmation does not match")
-        configuration.userHolder.createUser(username, BCrypt.hashpw(password, BCrypt.gensalt(8)))
+        try {
+            configuration.userHolder.createUser(username, BCrypt.hashpw(password, BCrypt.gensalt(8)))
+        } catch (e: IllegalArgumentException) {
+            return@post call.respondText("This username is occupied")
+        }
         call.respondRedirect("/login")
     }
 
