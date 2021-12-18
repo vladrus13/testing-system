@@ -6,6 +6,6 @@ import org.jetbrains.exposed.sql.Table
 object TestVerdicts : Table() {
     val testId = integer("testId")
     val submissionId = long("submissionId").references(Submissions.id, onDelete = ReferenceOption.CASCADE)
-    val serializedStatus = varchar("serializedStatus", length = 4096)
+    val serializedStatus = varchar("serializedStatus", length = 16384)
     override val primaryKey = PrimaryKey(testId, submissionId)
 }

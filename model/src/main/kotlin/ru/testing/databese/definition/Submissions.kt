@@ -8,6 +8,6 @@ object Submissions : Table() {
     val userId = long("userId").references(Users.id, onDelete = ReferenceOption.CASCADE)
     val taskName = varchar("taskName", length = 50)
     val testCount = integer("testCount")  // Allows partial testing, for example, pretests.
-    val serializedStatus = varchar("serializedStatus", length = 4096);
+    val serializedStatus = varchar("serializedStatus", length = 16384)
     override val primaryKey = PrimaryKey(id)
 }
