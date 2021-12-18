@@ -2,6 +2,7 @@ package ru.testing.html.views
 
 import kotlinx.html.HTML
 import kotlinx.html.a
+import kotlinx.html.br
 import kotlinx.html.h1
 import ru.testing.html.views.utils.Viewer
 
@@ -14,6 +15,14 @@ internal fun HTML.indexView() {
             }
             a("http://localhost:8080/chooseFile") {
                 +"Choose File"
+            }
+            br
+            a("/submissions") {
+                +"My submissions"
+            }
+            br
+            a("/logout") {
+                +"Logout"
             }
         }
     )

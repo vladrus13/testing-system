@@ -4,6 +4,8 @@ import interfaces.AbstractDatabaseInitializer
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.testing.databese.definition.Submissions
+import ru.testing.databese.definition.TestVerdicts
 import ru.testing.databese.definition.Users
 import java.io.IOException
 import java.util.*
@@ -26,7 +28,7 @@ class DatabaseInitializer : AbstractDatabaseInitializer {
             password = properties.getProperty("password")
         )
         transaction {
-            SchemaUtils.create(Users)
+            SchemaUtils.create(Users, Submissions, TestVerdicts)
         }
     }
 }

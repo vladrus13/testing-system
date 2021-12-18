@@ -3,15 +3,18 @@ package ru.testing.testlib.task
 import kotlinx.html.TABLE
 import kotlinx.html.td
 import kotlinx.html.tr
+import kotlinx.serialization.Serializable
 
 /**
  * Verdict we can get for a test
  *
  */
+@Serializable
 sealed class TestVerdict {
     /**
      * OK - correct answer
      */
+    @Serializable
     object OK : TestVerdict() {
         override fun toString(): String {
             return "OK!"
@@ -34,6 +37,7 @@ sealed class TestVerdict {
      *
      * @property description some additional information (like, "Different on line 99")
      */
+    @Serializable
     class WA(private val description: String) : TestVerdict() {
         override fun toString(): String {
             return "Wrong answer! $description"
@@ -54,6 +58,7 @@ sealed class TestVerdict {
     /**
      * TL - time limit in the test
      */
+    @Serializable
     object TL : TestVerdict() {
         override fun toString(): String = "Time limit."
 
@@ -75,6 +80,7 @@ sealed class TestVerdict {
      * @property code
      * @property verdict
      */
+    @Serializable
     class RE(private val code: Int, private val verdict: String) : TestVerdict() {
         override fun toString(): String {
             return "Code: $code. $verdict"
@@ -97,6 +103,7 @@ sealed class TestVerdict {
      * NL - not launcher on this test
      *
      */
+    @Serializable
     object NL : TestVerdict() {
         override fun toString(): String = "Not launched"
 

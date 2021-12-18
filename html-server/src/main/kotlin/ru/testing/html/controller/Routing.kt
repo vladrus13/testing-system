@@ -20,7 +20,9 @@ import org.mindrot.jbcrypt.BCrypt
 import ru.testing.html.views.*
 import ru.testing.html.views.utils.Viewer
 import ru.testing.polygon.submission.makeSubmission
+import ru.testing.testlib.domain.User
 import ru.testing.testlib.task.Task
+import java.lang.IllegalStateException
 
 /**
  * Respond of css
@@ -31,13 +33,15 @@ suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
     this.respondText(CssBuilder().apply(builder).toString(), ContentType.Text.CSS)
 }
 
+data class UserPrincipal(val user: User) : Principal
+
 /**
  * Routing function
  *
  */
 fun Application.module(configuration: EnvironmentConfiguration) = with(configuration) {
     install(Sessions) {
-        cookie<UserIdPrincipal>("user_session") {
+        cookie<UserPrincipal>("user_session") {
             // Configure session authentication
             cookie.path = "/"
             cookie.maxAgeInSeconds = 60 * 60  // 1 hour
@@ -45,9 +49,9 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
     }
 
     install(Authentication) {
-        session<UserIdPrincipal>("auth_session") {
+        session<UserPrincipal>("auth_session") {
             validate { session ->
-                session  // TODO: maybe we need to store user id somehow?
+                session
             }
             challenge {
                 call.respondRedirect("/login")
@@ -58,7 +62,9 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
             passwordParamName = "password"
             validate { credentials ->
                 if (validateUserCredentials(configuration, credentials)) {
-                    UserIdPrincipal(credentials.name)
+                    // Should not be null, because we looked up the user in the database, and deletion is not allowed.
+                    // On implementing deletion: Striped lock on id is useful here to prevent race conditions.
+                    UserPrincipal(configuration.userHolder.findUserByName(credentials.name)!!)
                 } else {
                     null
                 }
@@ -81,7 +87,7 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
             call.respondCss { testingSystemCss() }
         }
         get("/logout") {
-            call.sessions.clear<UserIdPrincipal>()
+            call.sessions.clear<UserPrincipal>()
             call.respondRedirect("/login")
         }
         get("/login") {
@@ -98,6 +104,13 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
                 Viewer.getHTML(
                     html = this,
                     body = { taskView(configuration.tasksHolder) })
+            }
+        }
+        authenticate("auth_form") {
+            post("/login") {
+                val principal = call.principal<UserPrincipal>()
+                call.sessions.set(principal)
+                call.respondRedirect("/")
             }
         }
         authenticate("auth_session") {
@@ -120,12 +133,11 @@ fun Application.module(configuration: EnvironmentConfiguration) = with(configura
                 val result = resultHolder.getVerdict(id)
                 call.respondHtml { Viewer.getHTML(html = this, body = { submissionResultView(result, id) }) }
             }
-        }
-        authenticate("auth_form") {
-            post("/login") {
-                val principal = call.principal<UserIdPrincipal>()
-                call.sessions.set(principal)
-                call.respondRedirect("/")
+            get("/submissions") {
+                val userId = call.principal<UserPrincipal>()?.user?.id
+                    ?: throw IllegalStateException("Should not happen - submissions page requires authentication")
+                val submissions = configuration.resultHolder.getLastSubmissions(userId, 10)
+                call.respondHtml { Viewer.getHTML(html = this, body = { submissionsView(submissions) }) }
             }
         }
     }
@@ -140,7 +152,11 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleUserRegister(co
         if (password.length < 5 || password.length > 40) return@post call.respondText("Password must be from 5 to 40 symbols")
         if (username.length < 3 || username.length > 25) return@post call.respondText("Username must be from 3 to 25 symbols")
         if (password != confirmation) return@post call.respondText("Password and confirmation does not match")
-        configuration.userHolder.createUser(username, BCrypt.hashpw(password, BCrypt.gensalt(8)))
+        try {
+            configuration.userHolder.createUser(username, BCrypt.hashpw(password, BCrypt.gensalt(8)))
+        } catch (e: IllegalArgumentException) {
+            return@post call.respondText("This username is occupied")
+        }
         call.respondRedirect("/login")
     }
 
@@ -188,7 +204,9 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.receiveTask(configura
             require(task != null) { "Task is not specified" }
             require(source != null) { "Source is not specified" }
             require(language != null) { "Language is not specified" }
-            val submission = makeSubmission(configuration, title, source, fileType = language, task)
+            val principal = call.principal<UserPrincipal>()
+                ?: throw IllegalStateException("Should never happen - submission require authentication")
+            val submission = makeSubmission(configuration, title, source, fileType = language, task, principal.user.id)
             configuration.testingQueue.add(submission)
             call.respondRedirect(url = "http://localhost:8080/submission/${submission.id}")
         } catch (e: IllegalArgumentException) {

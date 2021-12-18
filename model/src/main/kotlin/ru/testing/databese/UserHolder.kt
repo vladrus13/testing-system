@@ -9,7 +9,7 @@ import ru.testing.databese.definition.Users
 import ru.testing.testlib.domain.User
 
 class UserHolder : AbstractUserHolder {
-    override fun findUserById(id: Int): User? {
+    override fun findUserById(id: Long): User? {
         return transaction {
             Users.select { Users.id eq id }.map { mapToUser(it) }.firstOrNull()
         }
@@ -23,7 +23,7 @@ class UserHolder : AbstractUserHolder {
 
     override fun createUser(name: String, passwordHash: String) {
         if (findUserByName(name) != null) {
-            throw RuntimeException("This username is occupied")  // TODO: probably, can be better, don't know Kotlin specifics :(
+            throw IllegalArgumentException("This username is occupied")
         }
         return transaction {
             Users.insert {
