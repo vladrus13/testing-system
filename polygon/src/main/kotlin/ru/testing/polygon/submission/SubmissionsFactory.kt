@@ -19,8 +19,9 @@ fun makeSubmission(
     title: String,
     source: String,
     fileType: AbstractTypeOfLaunching,
-    task: Task
+    task: Task,
+    userId: Long
 ): SubmissionFile = with(configuration) {
-    val id = resultHolder.addTask(task)
+    val id = resultHolder.addSubmission(task, userId)
     return SubmissionFile(id, title, source, fileType, task)
 }

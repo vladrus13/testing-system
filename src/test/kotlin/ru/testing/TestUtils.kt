@@ -48,7 +48,8 @@ object TestUtils {
         val submissionFile = makeSubmission(
             configuration,
             title = "Source.$extension", source = source, fileType = language,
-            task = configuration.tasksHolder[task.id]!!
+            task = configuration.tasksHolder[task.id]!!,
+            1
         )
         try {
             configuration.testingQueue.add(submissionFile)
