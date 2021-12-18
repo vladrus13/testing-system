@@ -15,7 +15,7 @@ import kotlin.io.path.nameWithoutExtension
  *
  */
 sealed class OlympiadProgrammingLanguage : TypeOfLaunching() {
-    private val errorTextSize = 16000;
+    private val errorTextSize = 16000
 
     /**
      * Gets compiling command
