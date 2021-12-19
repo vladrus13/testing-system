@@ -47,6 +47,8 @@ class VerdictTests {
 
     }
 
+    private fun <T: Any> T.logged() = also(::println)
+
     @Nested
     inner class Ok {
         private fun SubmissionVerdict.allOk(expectedCount: Int) {
@@ -59,14 +61,14 @@ class VerdictTests {
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = OlympiadCpp, source = correctCpp(2)).allOk(12)
-            runTask(task = `A + B + C`, language = OlympiadCpp, source = correctCpp(3)).allOk(6)
+            runTask(task = `A + B`, language = OlympiadCpp, source = correctCpp(2).logged()).allOk(12)
+            runTask(task = `A + B + C`, language = OlympiadCpp, source = correctCpp(3).logged()).allOk(6)
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = OlympiadJava, source = correctJava(2)).allOk(12)
-            runTask(task = `A + B + C`, language = OlympiadJava, source = correctJava(3)).allOk(6)
+            runTask(task = `A + B`, language = OlympiadJava, source = correctJava(2).logged()).allOk(12)
+            runTask(task = `A + B + C`, language = OlympiadJava, source = correctJava(3).logged()).allOk(6)
         }
     }
 
@@ -76,7 +78,7 @@ class VerdictTests {
         fun cpp() = runBlocking {
             runTask(
                 task = `A + B`, language = OlympiadCpp,
-                source = correctCpp(2).replace("iostream", "lalala")
+                source = correctCpp(2).replace("iostream", "lalala").logged()
             ).assertCorrectness()
         }
 
@@ -84,7 +86,7 @@ class VerdictTests {
         fun java() = runBlocking {
             runTask(
                 task = `A + B`, language = OlympiadJava,
-                source = correctJava(2).replace("class", "lalala")
+                source = correctJava(2).replace("class", "lalala").logged()
             ).assertCorrectness()
         }
 
@@ -95,28 +97,30 @@ class VerdictTests {
 
     @Nested
     inner class TimeLimit {
-        private fun makeTL(code: String) = code.replaceFirst("}", "while (true) {}}").also { println(it) }
+        private fun makeTL(code: String) = code.replaceFirst("}", "while (true) {}}").logged()
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = OlympiadCpp, source = makeTL(correctCpp(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadCpp, source = makeTL(correctCpp(2))).assertCorrectness(12)
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = OlympiadJava, source = makeTL(correctJava(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadJava, source = makeTL(correctJava(2))).assertCorrectness(12)
         }
 
-        private fun SubmissionVerdict.assertCorrectness() {
+        private fun SubmissionVerdict.assertCorrectness(expectedCount: Int) {
             Assertions.assertTrue(
-                this is SubmissionVerdict.RunningVerdict && tests.all { it is TestVerdict.TL }, toString()
+                this is SubmissionVerdict.RunningVerdict
+                        && tests.size == expectedCount
+                        && tests.all { it is TestVerdict.TL }, toString()
             )
         }
     }
 
     @Nested
     inner class RuntimeError {
-        private fun makeRE(code: String) = code.replace("+", "+ 2 / (a1 - a1) +")
+        private fun makeRE(code: String) = code.replace("+", "+ 2 / (a1 - a1) +").logged()
 
         @Test
         fun cpp() = runBlocking {
@@ -137,22 +141,56 @@ class VerdictTests {
 
     @Nested
     inner class WrongAnswer {
-        private fun makeWA(code: String) = code.replace("+", "+ 1 +")
+        private fun makeWA(code: String) = code.replace("+", "+ 1 +").logged()
 
         @Test
         fun cpp() = runBlocking {
-            runTask(task = `A + B`, language = OlympiadCpp, source = makeWA(correctCpp(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadCpp, source = makeWA(correctCpp(2))).assertCorrectness(12)
         }
 
         @Test
         fun java() = runBlocking {
-            runTask(task = `A + B`, language = OlympiadJava, source = makeWA(correctJava(2))).assertCorrectness()
+            runTask(task = `A + B`, language = OlympiadJava, source = makeWA(correctJava(2))).assertCorrectness(12)
+        }
+
+        private fun SubmissionVerdict.assertCorrectness(expectedCount: Int) {
+            Assertions.assertTrue(
+                this is SubmissionVerdict.RunningVerdict
+                        && this.tests.size == expectedCount
+                        && tests.all { it is TestVerdict.WA }, toString()
+            )
+        }
+    }
+
+    @Nested
+    inner class CompilationTimeLimit {
+        private val codeWithTemplates = """
+             template < int i >                 
+             class  A                           
+             {                                  
+                A<i-1>   x;                     
+                A<i-2>   y;                     
+             };                                 
+             template <> class A<0>             
+             {                                  
+               char a;                          
+             };                                 
+             template <> class A<1>             
+             {                                  
+               char a;                          
+             };                                 
+             int  main(void)                  
+             {                                
+                A<600>  b;           
+                return 0;                     
+             } """.trimIndent()
+        @Test
+        fun cpp() = runBlocking {
+            runTask(task = `A + B`, language = OlympiadCpp.logged(), source = codeWithTemplates).assertCorrectness()
         }
 
         private fun SubmissionVerdict.assertCorrectness() {
-            Assertions.assertTrue(
-                this is SubmissionVerdict.RunningVerdict && tests.all { it is TestVerdict.WA }, toString()
-            )
+            Assertions.assertTrue(this is SubmissionVerdict.CompilationTimeLimit, toString())
         }
     }
 }
