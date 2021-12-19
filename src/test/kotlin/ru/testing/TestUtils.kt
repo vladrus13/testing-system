@@ -1,10 +1,8 @@
 package ru.testing
 
 import SimpleEnvironmentConfiguration
+import interfaces.AbstractDatabaseInitializer
 import kotlinx.coroutines.delay
-import ru.testing.databese.DatabaseInitializer
-import ru.testing.databese.ResultHolder
-import ru.testing.databese.UserHolder
 import ru.testing.polygon.database.TypeOfLaunchingHolder
 import ru.testing.polygon.queue.TestingQueue
 import ru.testing.polygon.server.Executors
@@ -36,9 +34,11 @@ object TestUtils {
             TasksHolder(),
             TestingQueue(),
             Executors(1),
-            ResultHolder(),
-            UserHolder(),
-            DatabaseInitializer(),
+            InMemoryResultHolder(),
+            InMemoryUserHolder(),
+            object : AbstractDatabaseInitializer {
+                override fun createSchema() = Unit
+            },
             TypeOfLaunchingHolder()
         )
         val extension = when (language) {
@@ -56,7 +56,7 @@ object TestUtils {
             val startTime = Instant.now()
             while (true) {
                 when (val verdict = configuration.resultHolder.getVerdict(submissionFile.id)) {
-                    is CompilationError -> return verdict
+                    is CompilationError, CompilationTimeLimit -> return verdict
                     is RunningVerdict -> if (TestVerdict.NL in verdict.tests) delay(1L) else return verdict
                     is NotLaunchedVerdict -> {
                         val tl = Limits.COMPILATION_LIMITS.timeLimitMilliseconds
