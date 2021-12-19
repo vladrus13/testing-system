@@ -161,4 +161,36 @@ class VerdictTests {
             )
         }
     }
+
+    @Nested
+    inner class CompilationTimeLimit {
+        private val codeWithTemplates = """
+             template < int i >                 
+             class  A                           
+             {                                  
+                A<i-1>   x;                     
+                A<i-2>   y;                     
+             };                                 
+             template <> class A<0>             
+             {                                  
+               char a;                          
+             };                                 
+             template <> class A<1>             
+             {                                  
+               char a;                          
+             };                                 
+             int  main(void)                  
+             {                                
+                A<600>  b;           
+                return 0;                     
+             } """.trimIndent()
+        @Test
+        fun cpp() = runBlocking {
+            runTask(task = `A + B`, language = OlympiadCpp.logged(), source = codeWithTemplates).assertCorrectness()
+        }
+
+        private fun SubmissionVerdict.assertCorrectness() {
+            Assertions.assertTrue(this is SubmissionVerdict.CompilationTimeLimit, toString())
+        }
+    }
 }
